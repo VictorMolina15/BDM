@@ -1,0 +1,197 @@
+
+/*-------- General -----------*/
+body {
+    font-family: Arial, sans-serif;
+    background-color: #2a2a2c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+button{
+    padding: 10px;
+    margin: 3px;
+    border-radius: 15px;
+    border: none;
+    cursor: pointer;
+}
+select {
+    background-color: none;
+    color: #007bff;
+    font-size: 15px;
+    border: solid 5px;
+    border: 3px solid #007bff;
+    border-radius: 10px;
+}
+
+hr {
+    border: none;
+    height: 2px;
+    background-color: #ccc; /* Color de la línea */
+    margin: 20px 0; /* Espaciado arriba y abajo */
+}
+/*-------- Apartado perfil -----------*/
+.profile-card {
+    background: white; 
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: left;
+    width: 800px;
+    height: auto;
+}
+.card-header{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.section-left {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.section-middle {
+    flex: 3;
+}
+
+.section-right {
+    display: flex;
+    flex: 1;
+    align-items: end;
+    justify-content: flex-end;
+}
+
+.line-separator {
+    border-right: 2px solid #007bff;
+    height: 100px;
+    margin: 0 20px;
+}
+
+.card-lists {
+    display: block;
+}
+.profile-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #007bff;
+}
+
+.username {
+    font-size: 1.5em;
+    margin: 10px 0;
+}
+
+.text-v1 {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.role {
+    display: inline-block;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: bold;
+}
+
+.seller {
+    background: #ffae00;
+    color: white;
+}
+
+.client {
+    background: #4caf50;
+    color: white;
+}
+.btn-v1{
+    background-color: #007bff;
+    color: white;
+    
+}
+.btn-v2{
+    background-color: #3e249b;
+    color: white;
+}
+.btn-v1:hover, .btn-v2:hover{
+    background-color: #281668;
+    color: white;
+    transition: background-color 0.6s ease-in-out;  
+}
+/*-------- Listas -----------*/
+#product-container {
+    width: 770px;
+    height: 300px;
+    overflow-y: auto; /* Habilita el scroll vertical */
+    scroll-behavior: smooth;
+    border: 2px solid #ccc;
+    padding: 10px;
+    margin-top: 10px;
+    background: #f9f9f9;
+    border-radius: 10px;
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    background: white;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.product-item:hover {
+    background: #e0e0e0;
+}
+
+.product-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.product-info {
+    flex: 1;
+}
+
+.product-info h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.product-info p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.link-item{
+    text-decoration: none;
+    color: #007bff;
+    font-size:18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.link-item:hover{
+    text-decoration: underline;
+    color: #08509e;
+}
+
+.link-seller{
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: #5b3cca;
+    cursor: pointer;
+}
+.link-seller:hover{
+    text-decoration: underline;
+    color: #2b1677;
+}

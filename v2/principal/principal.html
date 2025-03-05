@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Cursos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="../principal/principal.html" class="academy-name">MasteryAcademy</a>
+            </div>
+
+            <ul>
+                <li><a href="../curso/categorias.html">Cursos</a></li>
+                <li><a href="../curso/curso.html">Tus Cursos</a></li>
+                <li><a href="../curso/curso.html">Pendientes</a></li>
+                <li><a href="../inicio de sesion/log-in.html">Iniciar sesión</a></li>
+                <li><a href="../Registro/registro.html">Registrarse</a></li>
+            </ul>
+        
+            <div class="search-bar">
+                <input type="text" placeholder="Buscar...">
+            </div>
+        
+            <div class="cart-icon">
+                <a href="../carrito de compras/carrito.html"><i class="fas fa-shopping-cart"></i></a>
+            </div>
+        
+            <div class="profile-icon">
+                <a href="../perfil/usuario.html"><i class="fas fa-user-circle"></i></a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="carousel-container">
+            <div class="carousel-images">
+                <img src="https://via.placeholder.com/1920x400?text=Imagen+1" class="active" alt="Imagen 1">
+                <img src="https://via.placeholder.com/1920x400?text=Imagen+2" alt="Imagen 2">
+                <img src="https://via.placeholder.com/1920x400?text=Imagen+3" alt="Imagen 3">
+            </div>
+
+            <div class="dots-container">
+                <div class="dot active" data-index="0"></div>
+                <div class="dot" data-index="1"></div>
+                <div class="dot" data-index="2"></div>
+            </div>
+
+            <div class="recommended-box">
+                ¡Cursos recomendados para ti!
+            </div>
+        </div>
+
+        <h2>Basado en tus cursos</h2>
+
+        <div class="courses-section">
+            <!-- Primer curso -->
+            <div class="course-container">
+                <i class="fas fa-cart-plus cart-add-icon" data-id="1" data-name="Curso de JavaScript" data-author="Juan Pérez" data-price="49.99"></i>
+                <img src="https://via.placeholder.com/300x200" alt="Imagen del curso 1">
+                <h3>Curso de JavaScript</h3>
+                <p>Duración: 10 horas</p>
+                <p>Creador: Juan Pérez</p>
+                <div class="rating">
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                </div>
+                <p class="price">$49.99</p>
+                <button class="buy-button">Comprar</button>
+                <button class="completar-curso" onclick="mostrarDiploma()">Completar Curso</button>
+            </div>
+
+            <!-- Segundo curso -->
+            <div class="course-container">
+                <img src="https://via.placeholder.com/300x200" alt="Imagen del curso 2">
+                <h3>Curso de React</h3>
+                <p>Duración: 8 horas</p>
+                <p>Creador: Ana García</p>
+                <div class="rating" data-user-rating="4">
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                </div>
+                <p class="price">$59.99</p>
+                <button class="buy-btn">Comprar</button>
+                <i class="fas fa-cart-plus add-to-cart"></i>
+            </div>
+
+            <!-- Tercer curso -->
+            <div class="course-container">
+                <img src="https://via.placeholder.com/300x200" alt="Imagen del curso 3">
+                <h3>Curso de Vue.js</h3>
+                <p>Duración: 12 horas</p>
+                <p>Creador: Luis González</p>
+                <div class="rating" data-user-rating="5">
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                    <i class="fas fa-star star"></i>
+                </div>
+                <p class="price">$39.99</p>
+                <button class="buy-btn">Comprar</button>
+                <i class="fas fa-cart-plus add-to-cart"></i>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="social-icons">
+            <a href="https://www.facebook.com" target="_blank"><i class="fab fa-facebook"></i></a>
+            <a href="https://www.instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.twitter.com" target="_blank"><i class="fab fa-x-twitter"></i></a>
+        </div>
+
+        <div class="newsletter">
+            <p>Suscríbete a nuestro boletín informativo:</p>
+            <form id="newsletterForm">
+                <input type="email" id="email" name="email" placeholder="Tu correo electrónico" required>
+                <button type="submit">Suscribirse</button>
+            </form>
+        </div>
+    </footer>
+</body>
+</html>
