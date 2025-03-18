@@ -180,7 +180,7 @@ main .container .left .profile {
     border-radius: var(--card-border-radius);
 }
 
-.left .sidebar .menu-item {
+.left .sidebar .menu-item{
     display: flex;
     align-items: center;
     height: 4rem;
@@ -189,8 +189,14 @@ main .container .left .profile {
     position: relative;
 }
 
-.left .sidebar .menu-item:hover {
+.left .sidebar .menu-item:hover{
     background: var(--color-light);
+}
+.message:hover{
+    background: var(--color-light);
+    transition: all 500ms ease;
+    border-radius: 20px;
+    cursor:pointer;
 }
 
 .left .sidebar i {
@@ -503,6 +509,7 @@ main .container .right {
     margin-bottom: 1rem;
     align-items: start;
 }
+
 
 .right .message .profile-photo {
     position: relative;
