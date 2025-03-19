@@ -24,7 +24,7 @@ body
     background-image: url('../assets/img/fondo2.png');
     font: normal 12pt sans-serif;
     color:white;
-    overflow-x: hidden;
+    overflow: hidden;
     min-height: 100vh;
 }
 
@@ -104,9 +104,8 @@ section #text
 {
    position:absolute;
     color: rgb(183, 0, 255);
-    font-size: 10vw;
+    font-size: 5.5vw;
     text-align: center;
-    line-height: 0.55em;
     font-family: 'Press Start 2P', cursive;
 }
 
@@ -227,7 +226,6 @@ section #text span
 
 .formulario input {
     width: 70%;
-    display: block;
     margin: auto;
     margin-bottom: 2rem;
     background-color: transparent;
@@ -243,8 +241,18 @@ section #text span
 .formulario input::placeholder {
     color:white;
 }
-
-.formulario input[type="button"] {
+button{
+    border: solid thin white;
+    padding: .7rem;
+    border-radius: 2rem;
+    background-color: white;
+    font-weight: 600;
+    font-size: .8rem;
+    cursor: pointer;
+    color: #4fee4a;
+    margin: 5px
+}
+.formulario input[type="button"]{
     width: 60%;
     margin: auto;
     border: solid thin white;
@@ -270,6 +278,19 @@ section #text span
     font-size: .8rem;
     cursor: pointer;
     color: #4fee4a;
+}
+input[type=checkbox] {
+    appearance: none;
+    width: 5%;
+    margin:  0px 5px;
+    border: solid thin white;
+    padding: .6rem;
+    border-radius: 2rem;
+    cursor: pointer;
+}
+input[type=checkbox]:checked {
+    background-color: #4fee4a;
+    color: white;
 }
 
 .sign-in {

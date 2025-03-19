@@ -19,20 +19,6 @@ const Bg3 = document.querySelector('.bg-3');
 //Settings
 const settings = document.querySelector('#settings');
 const settingsModal = document.querySelector('.settings-modal');// modal ajustes
-//Profile photo
-const userTopPhoto = document.querySelector('#user-top-photo');
-const profileModal = document.querySelector('.profile-modal');//modal perfil
-/* ================== PROFILE MODAL ================== */
-const openProfileModal = () => {
-    profileModal.style.display = 'grid';
-}
-const closeProfileModal = (e) => {
-    if (e.target.classList.contains('profile-modal')) {
-        profileModal.style.display = 'none';
-    }
-}
-userTopPhoto.addEventListener('click', openProfileModal);
-profileModal.addEventListener('click', closeProfileModal);
 
 /* ================== LOCAL STORAGE ================== */
 

@@ -576,11 +576,14 @@ main .container .right {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 100%;
+    z-index: 3;
     text-align: center;
     display: grid;
     place-items: center;
     display: none;
+}
+.profile-modal{
+    z-index: 5;
 }
 .profile-modal .card{
     background: var(--color-white);
