@@ -568,9 +568,8 @@ main .container .right {
     display: flex;
     gap: 1rem;
 }
-
-/* =============== custom del tema ============== */
-.customize-theme {
+/* =============== Modal Perfil ============== */
+.profile-modal, .settings-modal, .customize-theme{ 
     background: rgba(0, 0, 0, 0.5);
     width: 100vw;
     height: 100vh;
@@ -583,8 +582,55 @@ main .container .right {
     place-items: center;
     display: none;
 }
-
-.customize-theme .card {
+.profile-modal .card{
+    background: var(--color-white);
+    padding: 2px;
+    border-radius: var(--card-border-radius);
+    width: 13%;
+    height: auto;
+    position: fixed;
+    top: 8%;
+    right: 8%;
+    border: 2px solid var(--color-secondary);
+}
+.profile-modal li{
+    border-radius: var(--card-border-radius);
+    margin: 5px;
+    cursor: pointer;
+}
+.profile-modal li:hover{
+    background: var(--color-light);
+    transition: all 500ms ease;
+}
+.profile-modal a{
+    color: var(--color-dark);
+    text-decoration: none;
+}
+.profile-modal a:hover{
+    color: var(--color-primary);
+}
+/* =============== Ajustes ============== */
+.settings-modal .card{
+    background: var(--color-white);
+    padding: 3rem;
+    border-radius: var(--card-border-radius);
+    width:40%;
+    box-shadow: 0 0 1rem var(--color-primary);
+}
+.settings-modal li{
+    background: var(--color-light);
+    padding: var(--search-padding);
+    border-radius: var(--card-border-radius);
+    margin: 8px;
+    cursor: pointer;
+}
+.settings-modal li:hover{
+    background: var(--color-primary);
+    color: var(--color-white);
+    transition: all 500ms ease;
+}
+/* =============== custom del tema ============== */
+.customize-theme .card{
     background: var(--color-white);
     padding: 3rem;
     border-radius: var(--card-border-radius);

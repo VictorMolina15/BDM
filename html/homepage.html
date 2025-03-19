@@ -25,7 +25,7 @@
             </div>
             <div class="create">
                 <label class="btn btn-primary" for="create-post">Crear</label>
-                <div class="profile-photo">
+                <div class="profile-photo" style="cursor:pointer" id="user-top-photo">
                     <img src="../assets/profile_pics/profile-1.png" alt="">
                 </div>
             </div>
@@ -133,7 +133,7 @@
                         <span><i class="uil uil-palette"></i></span>
                         <h3>Tema</h3>
                     </a>
-                    <a class="menu-item">
+                    <a class="menu-item" id="settings">
                         <span><i class="uil uil-setting"></i></span>
                         <h3>Ajustes</h3>
                     </a>
@@ -560,7 +560,28 @@
             </div>
         </div>
     </div>
-
+    <!----------------- MODAL DE AJUSTES --------------->
+    <div class="settings-modal">
+        <div class="card">
+            <h2>Ajustes</h2><br>
+            <ul>
+                <li><p>Configuración de Notificaciones</p></li>
+                <li><p>Administrar Bloqueos/Reportes</p></li>
+                <li><p>Ver actividad Reciente</p></li>
+                <li><p>Cerrar Sesión</p></li>
+            </ul>
+        </div>
+    </div>
+    <!----------------- MODAL DE PERFIL --------------->
+    <div class="profile-modal">
+        <div class="card">
+            <ul>
+                <li><a class="menu-item" href="#"><p>Ver Perfil</p></a></li>
+                <li><a class="menu-item" href="#">Configuración de Cuenta</a></li>
+                <li><a class="menu-item" href="index.html">Cerrar Sesión</a></li>
+            </ul>
+        </div>
+    </div>
     <script src="../js/homepage.js"></script>
 </body>
 

@@ -9,13 +9,32 @@ const messageSearch = document.querySelector('#message-search');
 
 //Theme
 const theme = document.querySelector('#theme');
-const themeModal = document.querySelector('.customize-theme');
+const themeModal = document.querySelector('.customize-theme');//modal personalización
 const fontSize = document.querySelectorAll('.choose-size span');
 var root = document.querySelector(':root');
 const colorPalette = document.querySelectorAll('.choose-color span');
 const Bg1 = document.querySelector('.bg-1');
 const Bg2 = document.querySelector('.bg-2');
 const Bg3 = document.querySelector('.bg-3');
+//Settings
+const settings = document.querySelector('#settings');
+const settingsModal = document.querySelector('.settings-modal');// modal ajustes
+//Profile photo
+const userTopPhoto = document.querySelector('#user-top-photo');
+const profileModal = document.querySelector('.profile-modal');//modal perfil
+/* ================== PROFILE MODAL ================== */
+const openProfileModal = () => {
+    profileModal.style.display = 'grid';
+}
+const closeProfileModal = (e) => {
+    if (e.target.classList.contains('profile-modal')) {
+        profileModal.style.display = 'none';
+    }
+}
+userTopPhoto.addEventListener('click', openProfileModal);
+profileModal.addEventListener('click', closeProfileModal);
+
+/* ================== LOCAL STORAGE ================== */
 
 // Guarda ajustes en el localStorage
 const saveSettings = () => {
@@ -120,6 +139,23 @@ const closeThemeModal = (e) => {
 
 themeModal.addEventListener('click', closeThemeModal);
 theme.addEventListener('click', openThemeModal);
+
+// ============== SETTINGS ============== 
+
+// Opens Modal
+const openSettingsModal = () => {
+    settingsModal.style.display = 'grid';
+}
+
+// Closes Modal
+const closeSettingsModal = (e) => {
+    if (e.target.classList.contains('settings-modal')) {
+        settingsModal.style.display = 'none';
+    }
+}
+
+settingsModal.addEventListener('click', closeSettingsModal);
+settings.addEventListener('click', openSettingsModal);
 
 
 // ============== FONT SIZE ============== 

@@ -49,7 +49,7 @@ async function login() {
         // Redirige al usuario a la página de inicio después de iniciar sesión
         const token = await user.getIdToken();
         localStorage.setItem('userToken', token);
-        window.location.href = "chatver2.html"; // Cambia esto por la URL de tu página de inicio
+        window.location.href = "index.html"; // Cambia esto por la URL de tu página de inicio
     } catch (error) {
         console.error("Error de inicio de sesión:", error);
         if (error.code === "auth/invalid-email") {
