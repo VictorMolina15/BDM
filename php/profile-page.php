@@ -13,57 +13,133 @@
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/profile.css">
 </head>
+
 <body>
     <!-- Navbar -->
     <?php include 'navbar.php'; ?>
     <!-- Profile Page -->
     <div class="profile-page">
         <div class="container">
-            <div class="profile-header">
-                <div class="profile-photo">
-                    <img src="../assets/profile_pics/profile-1.png" alt="">
-                </div>
-                <div class="profile-info">
-                    <h2>Usuario</h2>
-                    <p>Vive en Cancún</p>
-                    <p>Estudió en Universidad de Autónoma de Nuevo León</p>
-                </div>
-            </div>
-            <div class="profile-content">
-                <div class="profile-posts">
-                    <h3>Publicaciones</h3>
-                    <div class="post">
-                        <div class="post-header">
-                            <div class="profile-photo">
-                                <img src="../assets/profile_pics/profile-1.png" alt="">
-                            </div>
-                            <div class="profile-info">
-                                <h4>Victor</h4>
-                                <p>Estudiante de Ingeniería en Sistemas</p>
-                                <p>Universidad de El Salvador</p>
-                            </div>
-                        </div>
-                        <div class="post-content">
-                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptates.</p>
-                        </div>
+            <div class="top-cont">
+                <div class="card">
+                    <div class="banner">
+                        <img src="../assets/img/fondo2.png" alt="">
                     </div>
-                </div>
-                <div class="profile-friends">
-                    <h3>Amigos</h3>
-                    <div class="friend">
-                        <div class="profile-photo">
-                            <img src="../assets/profile_pics/profile-1.png" alt="">
+                    <div class="bottom">
+                        <div class="profile-img">
+                            <img src="../assets/profile_pics/profile-1.png">
                         </div>
-                        <div class="profile-info">
-                            <h4>Victor</h4>
-                            <p>Estudiante de Ingeniería en Sistemas</p>
-                            <p>Universidad de El Salvador</p>
+                        <div class="card">
+                            <div class="name">
+                                <h2>Usuario</h2>
+                                <p>@Usuario_gg</p>
+                            </div>
+                            <div class="actions">
+                                <button class="btn-primary">Seguir</button>
+                                <button class="btn-secondary">Mensaje</button>
+                                <button class="btn-secondary">Bloquear</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="feed-container">
+            <div class="left-cont">
+                <div class="sidebar">
+                    <div class="profile-info">
+                        <h2>Detalles</h2>
+                        <p>Vive en Cancún</p>
+                        <p>Estudió en Universidad de Autónoma de Nuevo León</p>
+                        <p>Nacío el 30 de Febrero de 2026</p>
+                    </div>
+                    <div class="profile-friends">
+                        <h3>Amigos</h3>
+                        <div class="friend">
+                            <div class="profile-photo">
+                                <img src="../assets/profile_pics/profile-2.jpg" alt="">
+                            </div>
+                            <div class="profile-photo">
+                                <img src="../assets/profile_pics/profile-4.jpg" alt="">
+                            </div>
+                            <div class="profile-photo">
+                                <img src="../assets/profile_pics/profile-6.png" alt="">
+                            </div>
+                            <div class="profile-photo">
+                                <img src="../assets/profile_pics/profile-7.png" alt="">
+                            </div>
+                            <div class="profile-photo">
+                                <img src="../assets/profile_pics/profile-3.jpg" alt="">
+                            </div>
+                            <div class="profile-photo">
+                                <img src="../assets/profile_pics/profile-8.png" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="right-cont">
+                <div class="profile-content">
+                    <h3>Publicaciones</3>
+                </div>
+                <div class="feeds">
+                    <!-------- Feed De Ejemplo -------->
+                    <div class="feed">
+                        <div class="head">
+                            <div class="user">
+                                <div class="profile-photo">
+                                    <img src="../assets/profile_pics/profile-1.png">
+                                </div>
+                                <div class="info">
+                                    <h3>Random</h3>
+                                    <small>Hace 50 minutos</small>
+                                </div>
+                            </div>
+                            <span class="edit">
+                                <i class="uil uil-ellipsis-h"></i>
+                            </span>
+                        </div>
+                        <div class="description">
+                            <p>Achicopalado</p>
+                        </div>
+                        <div class="photo">
+                            <img src="../assets/post_img/post-3.jpg">
+                        </div>
+
+                        <div class="action-buttons">
+                            <div class="interaction-buttons">
+                                <span><i class="uil uil-heart"></i></span>
+                                <span><i class="uil uil-comment-dots"></i></span>
+                                <span><i class="uil uil-share-alt"></i></span>
+                            </div>
+                            <div class="bookmark">
+                                <span><i class="uil uil-bookmark-full"></i></span>
+                            </div>
+                        </div>
+
+                        <div class="liked-by">
+                            <span><img src="../assets/profile_pics/profile-12.jpg"></span>
+                            <span><img src="../assets/profile_pics/profile-9.jpg"></span>
+                            <span><img src="../assets/profile_pics/profile-2.jpg"></span>
+                            <p>Le gusta a <b>Random</b> y <b>Otros 5,179</b></p>
+                        </div>
+
+                        <div class="caption">
+                            <p><b>Random</b> yo ese
+                                <span class="harsh-tag"></span>
+                            </p>
+                        </div>
+
+                        <div class="comments text-muted">
+                            Ver todos los 408 comentarios
+                        </div>
+                    </div>
+                    <!-------- Fin del Feed -------->
+                </div>
+            </div>
+        </div>
     </div>
-    <script src="../js/profile.js"></script>
+    <script src="../js/loadTheme.js"></script>
 </body>
+
 </html>

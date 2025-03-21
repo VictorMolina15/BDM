@@ -1,8 +1,10 @@
 <nav>
     <div class="container">
+        <a href="home-page.php" class="logo">
         <h2 class="logo">
             HiJinx
         </h2>
+        </a>
         <div class="search-bar">
             <i class="uil uil-search"></i>
             <input type="search" placeholder="Busca personas, comunidades, posts, etc.">
@@ -19,11 +21,11 @@
 <div class="profile-modal">
     <div class="card">
         <ul>
-            <li><a class="menu-item" href="#">
+            <li><a class="menu-item" href="profile-page.php">
                     <p>Ver Perfil</p>
                 </a></li>
             <li><a class="menu-item" href="#">Configuración de Cuenta</a></li>
-            <li><a class="menu-item" href="index.html">Cerrar Sesión</a></li>
+            <li><a class="menu-item" href="index.php">Cerrar Sesión</a></li>
         </ul>
     </div>
 </div>

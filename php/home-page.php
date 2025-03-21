@@ -551,7 +551,7 @@
                 <li><p>Configuración de Notificaciones</p></li>
                 <li><p>Administrar Bloqueos/Reportes</p></li>
                 <li><p>Ver actividad Reciente</p></li>
-                <li><p>Cerrar Sesión</p></li>
+                <li onclick="location='index.php'"><p>Cerrar Sesión</p></li>
             </ul>
         </div>
     </div>

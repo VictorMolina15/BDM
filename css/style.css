@@ -142,7 +142,9 @@ nav .create {
     align-items: center;
     gap: 2rem;
 }
-
+nav .logo{
+    color: var(--color-dark);
+}
 /* =============== Main ============== */
 main {
     position: relative;
@@ -391,7 +393,7 @@ main .container .left .profile {
 }
 
 /* =============== Feeds ============== */
-.middle .feeds .feed {
+.feeds .feed {
     background: var(--color-white);
     border-radius: var(--card-border-radius);
     padding: var(--card-padding);
@@ -400,17 +402,17 @@ main .container .left .profile {
     line-height: 1.5;
 }
 
-.middle .feed .head {
+.feed .head {
     display: flex;
     justify-content: space-between;
 }
 
-.middle .feed .user {
+.feed .user {
     display: flex;
     gap: 1rem;
 }
 
-.middle .feed .photo {
+.feed .photo {
     border-radius: var(--card-border-radius);
     overflow: hidden;
     margin: 0.7rem 0;
@@ -420,7 +422,7 @@ main .container .left .profile {
     margin-top: 5px;
 }
 
-.middle .feed .action-buttons {
+.feed .action-buttons {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -428,11 +430,11 @@ main .container .left .profile {
     margin: 0.6rem 0;
 }
 
-.middle .liked-by {
+.liked-by {
     display: flex;
 }
 
-.middle .liked-by span {
+.liked-by span {
     width: 1.4rem;
     height: 1.4rem;
     display: block;
@@ -442,11 +444,11 @@ main .container .left .profile {
     margin-left: -0.6rem;
 }
 
-.middle .liked-by span:first-child {
+.liked-by span:first-child {
     margin: 0;
 }
 
-.middle .liked-by p {
+.liked-by p {
     margin-left: 0.5rem;
 }
 
