@@ -12,6 +12,7 @@
     <!-- Stylesheet -->
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/profile.css">
+    <script src="../js/loadTheme.js"></script>
 </head>
 
 <body>
@@ -139,7 +140,7 @@
             </div>
         </div>
     </div>
-    <script src="../js/loadTheme.js"></script>
+    
 </body>
 
 </html>

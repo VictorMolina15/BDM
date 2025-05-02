@@ -22,11 +22,11 @@ var passwordInput = document.getElementById("password");
 passwordInput.addEventListener("keyup", function (event) {
     if (event.key === "Enter") {
         // Llama a la función de inicio de sesión cuando se presiona la tecla "Enter"
-        login();
+        //login();
     }
 });
 
-btnLogin.addEventListener("click", login);
+//btnLogin.addEventListener("click", login);
 
 async function login() {
     const email = document.getElementById("email").value;

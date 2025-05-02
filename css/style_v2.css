@@ -182,7 +182,7 @@ section #text span
 }
 
 .formulario {
-    width: 400px;
+    width: 550px;
     padding: 1rem;
     margin: 2rem;
     background-color: rgba(180, 123, 255, 0.602);
@@ -225,7 +225,7 @@ section #text span
 }
 
 .formulario input {
-    width: 70%;
+    width: 80%;
     margin: auto;
     margin-bottom: 2rem;
     background-color: transparent;
@@ -777,11 +777,21 @@ border: solid 1px rgb(197, 30, 147);
 overflow-wrap: anywhere;
 overflow: auto;
 }
+.msg{
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+.success {
+    background-color: #d4edda;
+    color: #155724;
+}
 .error {
-color: red;
+background-color: #f8d7da;
+color: #721c24;
 font-size: 12px;
 font-weight: bolder;
-margin-left: 1%;
 }
 section {
 background: transparent;

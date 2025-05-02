@@ -12,14 +12,14 @@
     <header id="header">
       <a href="#" class="logo">HiJinx</a>
       <ul>
-        <li class="button" onclick="location='login.php'"><a href="#" class="active" >Login</a></li>
-        <li class="button" onclick="location='crear cuenta.php'"><a href="#">Register</a></li>
+        <li class="button" onclick="location='login-page.php'"><a href="#" class="active" >Login</a></li>
+        <li class="button" onclick="location='register-page.php'"><a href="#">Register</a></li>
         <li class="button" onclick="location='home-page.php'"><a href="#">Home</a></li>
       </ul>
     </header>
     <section>
       <p id="text">Unéte y conecta con miles de personas!</p> 
-      <a href="#" id="btn" onclick="location='crear cuenta.php'">REGISTRATE AQUI</a>
+      <a href="register-page.php" id="btn">REGISTRATE AQUI</a>
     </section>
   <script src="../js/script.js"></script>
   </body>

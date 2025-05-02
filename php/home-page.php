@@ -1,3 +1,6 @@
+<?php
+    session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -25,9 +28,9 @@
                         <img src="../assets/profile_pics/profile-1.png" alt="">
                     </div>
                     <div class="handle">
-                        <h4>Usuario</h4>
+                        <h4> <?php  echo $_SESSION['username'] ?? "Usuario"; ?> </h4>
                         <p class="text-muted">
-                            @usuario_gg
+                            <?php  echo $_SESSION['id_name'] ?? "Usuario_gg"; ?> 
                         </p>
                     </div>
                 </a>
