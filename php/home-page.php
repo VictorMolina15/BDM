@@ -23,7 +23,7 @@
         <div class="container">
             <!----------------- IZQUIERDA -------------------->
             <div class="left">
-                <a class="profile">
+            <a class="profile" href="profile-page.php?user=<?= $_SESSION['id_name'] ?>" style="text-decoration: none; color: var(--color-dark);">
                     <div class="profile-photo">
                         <img src="../assets/profile_pics/profile-1.png" alt="">
                     </div>
@@ -187,7 +187,7 @@
                                     <img src="../assets/profile_pics/profile-2.jpg">
                                 </div>
                                 <div class="info">
-                                    <h3>Random</h3>
+                                    <a href="profile-page.php?user=BrandNew_gg"><h3>Brandonsito</h3></a>
                                     <small>Monterrey, Nuevo León. Hace 15 minuto(s)</small>
                                 </div>
                             </div>
@@ -554,7 +554,7 @@
                 <li><p>Configuración de Notificaciones</p></li>
                 <li><p>Administrar Bloqueos/Reportes</p></li>
                 <li><p>Ver actividad Reciente</p></li>
-                <li onclick="location='index.php'"><p>Cerrar Sesión</p></li>
+                <li onclick="location='back-end/session-end.php'"><p>Cerrar Sesión</p></li>
             </ul>
         </div>
     </div>

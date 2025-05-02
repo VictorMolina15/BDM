@@ -1,3 +1,30 @@
+<?php
+require_once 'back-end/connection.php';
+include 'back-end/verified-session.php';
+$db = new DBConnection();
+$conn = $db->getConnection();
+
+// Obtener el usuario desde la URL
+$viewedUserId = $_GET['user'] ?? null;
+
+if (!$viewedUserId) {
+    echo "<script>alert('No se especificó un usuario.'); window.location.href = 'home-page.php';</script>";
+    exit;
+}
+
+$stmt = $conn->prepare("SELECT * FROM users WHERE id_name = ?");
+$stmt->execute([$viewedUserId]);
+$userData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$userData) {
+    echo "<script>alert('El usuario no existe.'); window.location.href = 'home-page.php';</script>";
+    exit;
+}
+
+// Verificamos si el perfil visitado es el mismo que el usuario en sesión
+$isOwnProfile = isset($_SESSION['id_name']) && $_SESSION['id_name'] === $viewedUserId;
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -36,10 +63,16 @@
                                 <p>@Usuario_gg</p>
                             </div>
                             <div class="actions">
-                                <button class="btn-primary">Seguir</button>
-                                <button class="btn-secondary">Mensaje</button>
-                                <button class="btn-secondary">Bloquear</button>
+                                <?php if ($isOwnProfile): ?>
+                                    <button class="btn-secondary">Subir historia</button>
+                                    <button class="btn-secondary">Editar Perfil</button>
+                                <?php else: ?>
+                                    <button class="btn-primary">Seguir</button>
+                                    <button class="btn-secondary">Mensaje</button>
+                                    <button class="btn-secondary">Bloquear</button>
+                                <?php endif; ?>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -140,7 +173,7 @@
             </div>
         </div>
     </div>
-    
+
 </body>
 
 </html>

@@ -12,9 +12,8 @@
     <header id="header">
       <a href="#" class="logo">HiJinx</a>
       <ul>
-        <li class="button" onclick="location='login-page.php'"><a href="#" class="active" >Login</a></li>
+        <li class="button" onclick="location='login-page.php'"><a href="#" class="btn" >Login</a></li>
         <li class="button" onclick="location='register-page.php'"><a href="#">Register</a></li>
-        <li class="button" onclick="location='home-page.php'"><a href="#">Home</a></li>
       </ul>
     </header>
     <section>

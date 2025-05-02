@@ -194,6 +194,11 @@ main .container .left .profile {
 .left .sidebar .menu-item:hover{
     background: var(--color-light);
 }
+
+main .container .left .profile:hover{
+    opacity: 0.8;
+}
+
 .message:hover{
     background: var(--color-light);
     transition: all 500ms ease;
@@ -417,7 +422,10 @@ main .container .left .profile {
     overflow: hidden;
     margin: 0.7rem 0;
 }
-
+.feed a{
+    text-decoration: none;
+    color: var(--color-dark);
+}
 .description p{
     margin-top: 5px;
 }

@@ -25,7 +25,7 @@
                     <p>Ver Perfil</p>
                 </a></li>
             <li><a class="menu-item" href="#">Configuración de Cuenta</a></li>
-            <li><a class="menu-item" href="index.php">Cerrar Sesión</a></li>
+            <li><a class="menu-item" href="back-end/session-end.php">Cerrar Sesión</a></li>
         </ul>
     </div>
 </div>

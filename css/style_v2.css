@@ -392,7 +392,9 @@ nav .nav-right .profile, .container .left-panel .profile{
     border-radius: 50%;
     cursor: pointer;
 }
-
+a .profile{
+    text-decoration: none;
+}
 nav .nav-right a{
     text-decoration: none;
     color:white;
