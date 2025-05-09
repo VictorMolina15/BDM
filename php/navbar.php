@@ -21,7 +21,7 @@
 <div class="profile-modal">
     <div class="card">
         <ul>
-            <li><a class="menu-item" href="profile-page.php">
+            <li><a class="menu-item" href="profile-page.php?user=<?= $_SESSION['id_name'] ?>">
                     <p>Ver Perfil</p>
                 </a></li>
             <li><a class="menu-item" href="#">Configuración de Cuenta</a></li>

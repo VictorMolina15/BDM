@@ -1,13 +1,20 @@
 <?php
-session_start(); // Aseguramos que la sesión esté activa
-
-// Destruir todas las variables de sesión
+session_start();
 session_unset();
-
-// Destruir la sesión
 session_destroy();
-
-// Redirigir al login
-header("Location: ../index.php");
-exit();
 ?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cerrando sesión...</title>
+    <script>
+        localStorage.removeItem('settings');
+        window.location.href = "../index.php";
+    </script>
+</head>
+<body>
+    <p>Cerrando sesión...</p>
+</body>
+</html>

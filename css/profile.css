@@ -127,3 +127,139 @@
     background: var(--color-white);
     border-radius: var(--card-border-radius);
 }
+/* ========== Modal Edit Profile ============ */
+.modal {
+    display: none;
+    /* Oculto por defecto */
+    position: fixed;
+    /* Fijo en la pantalla */
+    z-index: 10;
+    /* Por encima de otros elementos */
+    left: 0;
+    top: 0;
+    width: 100%;
+    /* Ancho completo */
+    height: 100%;
+    /* Alto completo */
+    overflow: hidden;
+    /* Ocultar desplazamiento */
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal input {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    background-color: var(--color-white);
+    color: var(--color-primary);
+}
+.modal input:hover, button:hover , .modal label:hover {
+    opacity: 0.8;
+    transition: 0.3s ease-in-out;
+    cursor: pointer;
+}
+.modal input[type="text"]{
+    height: 40px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin: 5px 0;
+}
+.modal-content {
+    background-color: var(--color-white);
+    margin: 5% auto;
+    /* 15% desde la parte superior y centrado */
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 15px;
+    width: 50%;
+    /* Ancho del modal */
+}
+
+.modal-content h2 {
+    margin: 0 0 20px 0;
+    padding-bottom: 10px;
+    font-size: 24px;
+    text-align: center;
+    color: var(--color-dark);
+    border-bottom: #888 solid 2px;
+}
+
+.custom-file-input input[type="file"] {
+    display: none;
+    /* Ocultar el input de archivo */
+}
+
+.custom-file-input label {
+    display: inline-block;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding: 10px;
+    border-radius: 15px;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+}
+
+.modal-content input[type="submit"] {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    width: 100%;
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+}
+
+.modal-content textarea {
+    font-family: 'poppins', sans-serif;
+    font-size: 16px;
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    width: 100%;
+    height: 70px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    resize: none;
+    /* Deshabilitar el cambio de tamaño */
+}
+
+.form-group {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 20px;
+}
+
+.form-group .section-1 {
+    flex: 1;
+    justify-items: center;
+    margin-right: 10px;
+}
+
+.form-group .section-2 {
+    flex: 2;
+    margin-left: 10px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer
+}
+
+.edit-p-img {
+    align-self: center;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.edit-p-cover {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}

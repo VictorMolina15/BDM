@@ -16,7 +16,9 @@ $stmt = $conn->prepare("SELECT * FROM users WHERE id_name = ?");
 $stmt->execute([$viewedUserId]);
 $userData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$userData) {
+if ($userData) {
+    //  procesar los datos del usuario
+}else{
     echo "<script>alert('El usuario no existe.'); window.location.href = 'home-page.php';</script>";
     exit;
 }
@@ -43,15 +45,52 @@ $isOwnProfile = isset($_SESSION['id_name']) && $_SESSION['id_name'] === $viewedU
 </head>
 
 <body>
+
     <!-- Navbar -->
     <?php include 'navbar.php'; ?>
+    <!-- Modal Edit Profile -->
+    <div class="modal" id="modal-edit-profile">
+        <div class="modal-content">
+            <span class="close" id="close-modal">&times;</span>
+            <h2>Editar Perfil</h2>
+            <form action="" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <div class="section-1">
+                        <h3>Foto de perfil:</h3>
+                        <img class="edit-p-img" src="../assets/profile_pics/profile-1.png" alt="">
+                        <div class="custom-file-input">
+                            <input type="file" name="profile-pic" id="profile-pic" accept="image/*">
+                            <label for="profile-pic">Subir nueva foto de perfil</label>
+                        </div>
+                    </div>
+                    <div class="section-2">
+                        <h3>Foto de portada:</h3>
+                        <img class="edit-p-cover" src="../assets/cover-img/fondo2.png" alt="">
+                        <div class="custom-file-input">
+                            <input type="file" name="cover-pic" id="cover-pic" accept="image/*">
+                            <label for="cover-pic">Subir nueva foto de portada</label>
+                        </div>
+                    </div>
+                </div>
+                <h3>Nombre de Usuario</h3>
+                <input type="text" name="username" id="username" value="<?= htmlspecialchars($userData['username']) ?>" placeholder="Nombre de usuario" required>
+                <h3>Biografía</h3>
+                <textarea name="bio" id="bio" maxlength="100" placeholder="Escribe aquí..."></textarea>
+                <h3>Detalles</h3>
+                <p>Vive en <input type="text" name="location" id="location" placeholder="Ubicación"></p>
+                <p>Estudió en <input type="text" name="school" id="school" placeholder="Escuela"></p><br>
+                <input type="submit" class="btn-secondary" value="Guardar Cambios" />
+
+            </form>
+        </div>
+    </div>
     <!-- Profile Page -->
     <div class="profile-page">
         <div class="container">
             <div class="top-cont">
                 <div class="card">
                     <div class="banner">
-                        <img src="../assets/img/fondo2.png" alt="">
+                        <img src="../assets/cover-img/fondo2.png" alt="">
                     </div>
                     <div class="bottom">
                         <div class="profile-img">
@@ -65,7 +104,7 @@ $isOwnProfile = isset($_SESSION['id_name']) && $_SESSION['id_name'] === $viewedU
                             <div class="actions">
                                 <?php if ($isOwnProfile): ?>
                                     <button class="btn-secondary">Subir historia</button>
-                                    <button class="btn-secondary">Editar Perfil</button>
+                                    <button id="edit-profile" class="btn-secondary">Editar Perfil</button>
                                 <?php else: ?>
                                     <button class="btn-primary">Seguir</button>
                                     <button class="btn-secondary">Mensaje</button>
@@ -175,5 +214,15 @@ $isOwnProfile = isset($_SESSION['id_name']) && $_SESSION['id_name'] === $viewedU
     </div>
 
 </body>
+<script>
+    //  Arbrir el modal de edición de perfil
+    document.querySelector('#edit-profile').addEventListener('click', function () {
+        document.getElementById('modal-edit-profile').style.display = 'block';
+    });
+    // Cerrar el modal de edición de perfil
+    document.querySelector('#close-modal').addEventListener('click', function () {
+        document.getElementById('modal-edit-profile').style.display = 'none';
+    });
+</script>
 
 </html>

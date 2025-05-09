@@ -127,7 +127,6 @@
                 <!----------------- BARRA DE ALADO XD -------------------->
                 <label class="btn btn-primary" for="create-post">Crear Post</label>
             </div>
-
             <!-----------------TOP PAGE -------------------->
             <div class="middle">
                 <!----------------- HISTORIAS -------------------->
