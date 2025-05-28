@@ -10,7 +10,7 @@
             <input type="search" placeholder="Busca personas, comunidades, posts, etc.">
         </div>
         <div class="create">
-            <label class="btn btn-primary" for="create-post">Crear</label>
+            <label id="btn-crear" class="btn btn-primary">Crear</label>
             <div class="profile-photo" style="cursor:pointer" id="user-top-photo">
                 <img src="<?=(!empty($_SESSION['avatar']) && $_SESSION['avatar'] !== null) 
                 ? '../assets/profile_pics/' . htmlspecialchars($_SESSION['avatar']) 
@@ -20,7 +20,7 @@
     </div>
 </nav>
 <!----------------- MODAL DE PERFIL --------------->
-<div class="profile-modal">
+<div class="modal profile-modal">
     <div class="card">
         <ul>
             <li><a class="menu-item" href="profile-page.php?user=<?= $_SESSION['id_name'] ?>">
@@ -31,13 +31,23 @@
         </ul>
     </div>
 </div>
+<div class="modal create-modal">
+    <div class="card">
+        <ul>
+            <li><a class="menu-item" href="#">Crear publicación</a></li>
+            <li><a class="menu-item" href="#">Crear Comunidad</a></li>
+            <li><a class="menu-item" href="#">Subir historia</a></li>
+        </ul>
+    </div>
+</div>
 <script>
-    //Profile photo
-    const userTopPhoto = document.querySelector('#user-top-photo');
-    const profileModal = document.querySelector('.profile-modal');//modal perfil
     /* ================== PROFILE MODAL ================== */
+    const userTopPhoto = document.querySelector('#user-top-photo');
+    const profileModal = document.querySelector('.profile-modal');
+    
     const openProfileModal = () => {
         profileModal.style.display = 'grid';
+        CreateModal.style.display = 'none';
     }
     const closeProfileModal = (e) => {
         if (e.target.classList.contains('profile-modal')) {
@@ -46,4 +56,20 @@
     }
     userTopPhoto.addEventListener('click', openProfileModal);
     profileModal.addEventListener('click', closeProfileModal);
+
+    /* ================== CREATE MODAL ================== */
+    const CreateModal = document.querySelector('.create-modal');
+    const btnCreateModal = document.querySelector('#btn-crear');
+
+    const openCreateModal = () => {
+        CreateModal.style.display = 'grid';
+        profileModal.style.display = 'none';
+    }
+    const closeCreateModal = (e) => {
+        if (e.target.classList.contains('create-modal')) {
+            CreateModal.style.display = 'none';
+        }
+    }
+    btnCreateModal.addEventListener('click', openCreateModal);
+    CreateModal.addEventListener('click', closeCreateModal);
 </script>

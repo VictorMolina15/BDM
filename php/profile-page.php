@@ -79,6 +79,8 @@ if (isset($_SESSION['edit_feedback_msg'])) {
     <!-- Stylesheet -->
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/profile.css">
+    <link rel="stylesheet" href="../css/messaging.css">
+
     <script src="../js/loadTheme.js"></script>
 </head>
 
@@ -165,7 +167,7 @@ if (isset($_SESSION['edit_feedback_msg'])) {
 
                 <h3>Detalles</h3>
                 <div class="form-row">
-                    <div class="form-group-inline">    
+                    <div class="form-group-inline">
                         <p>Vive en <input type="text" name="location" id="edit_location"
                                 value="<?= htmlspecialchars($userData['location'] ?? '') ?>" placeholder="Ubicación">
                         </p>
@@ -205,7 +207,12 @@ if (isset($_SESSION['edit_feedback_msg'])) {
                                     <button id="edit-profile" class="btn-secondary">Editar Perfil</button>
                                 <?php else: ?>
                                     <button class="btn-primary">Seguir</button>
-                                    <button class="btn-secondary">Mensaje</button>
+                                    <button id="initiate-chat-btn-profile" class="btn-secondary"
+                                        data-other-user-id="<?= htmlspecialchars($userData['id_name']) ?>"
+                                        data-other-user-name="<?= htmlspecialchars($userData['username']) ?>"
+                                        data-other-user-avatar="<?= htmlspecialchars($userData['profile_picture'] ?? '') ?>">
+                                        Mensaje
+                                    </button>
                                     <button class="btn-secondary">Bloquear</button>
                                 <?php endif; ?>
                             </div>
@@ -222,7 +229,7 @@ if (isset($_SESSION['edit_feedback_msg'])) {
                         <h2>Detalles</h2>
                         <p> <?= htmlspecialchars($userData['biography']) ?></p>
                         <p>Vive en <?= htmlspecialchars($userData['location']) ?></p>
-                        <p>Estudió en  <?= htmlspecialchars($userData['education']) ?></p>
+                        <p>Estudió en <?= htmlspecialchars($userData['education']) ?></p>
                         <p>Nacío el 30 de Febrero de 2026</p>
                     </div>
                     <div class="profile-friends">
@@ -377,9 +384,16 @@ if (isset($_SESSION['edit_feedback_msg'])) {
             }
         });
     }
-
-    // Al abrir el modal, restablecer las vistas previas a las imágenes actuales del usuario
-
 </script>
+<script>
+    const currentLoggedInUserId = "<?php echo htmlspecialchars($_SESSION['id_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>";
+    const loggedInUser = {
+        id_name: "<?php echo htmlspecialchars($_SESSION['id_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>",
+        username: "<?php echo htmlspecialchars($_SESSION['username'] ?? '', ENT_QUOTES, 'UTF-8'); ?>",
+        // Ensure 'avatar' is the correct session variable key for the profile picture filename
+        avatar: "<?php echo htmlspecialchars($_SESSION['avatar'] ?? 'default-profile.png', ENT_QUOTES, 'UTF-8'); ?>"
+    };
+</script>
+<script src="../js/messaging.js"></script>
 
 </html>

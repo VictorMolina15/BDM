@@ -1,0 +1,190 @@
+/* ============== Chat Popup ============== */
+.chat-popup {
+    position: fixed;
+    bottom: 0;
+    /* 'right' will be set by JS for stacking */
+    width: 320px; /* Increased width */
+    height: 420px; /* Increased height */
+    background-color: var(--color-white);
+    border: 1px solid var(--color-grey); /* Softer border */
+    border-radius: var(--card-border-radius) var(--card-border-radius) 0 0;
+    box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.15);
+    display: flex; /* Changed from grid */
+    flex-direction: column;
+    z-index: 1001; /* Higher than navbar if navbar is 1000 */
+    transition: right 0.3s ease-out; /* Smooth transition for repositioning */
+}
+
+.chat-header {
+    background: var(--color-primary);
+    color: var(--color-white);
+    padding: 8px 12px; /* Adjusted padding */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top-left-radius: var(--card-border-radius); /* Match popup */
+    border-top-right-radius: var(--card-border-radius);/* Match popup */
+    cursor: default; /* Usually headers are not for dragging unless implemented */
+}
+
+.chat-header .chat-avatar {
+    width: 30px; /* Smaller avatar in header */
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 8px;
+    border: 1px solid var(--color-light); /* Small border for avatar */
+}
+
+.chat-header .chat-user-name {
+    font-weight: 600; /* Slightly bolder */
+    font-size: 0.95rem;
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-header .chat-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--color-white);
+    font-size: 1.6rem; /* Larger close icon */
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 5px; /* Easier to click */
+    opacity: 0.8;
+}
+.chat-header .chat-close-btn:hover {
+    opacity: 1;
+}
+
+.chat-messages-area {
+    flex-grow: 1;
+    padding: 10px;
+    overflow-y: auto;
+    background-color: var(--color-light); /* Light background for messages */
+    display: flex;
+    flex-direction: column; /* Bubbles stack vertically */
+}
+
+.chat-bubble {
+    max-width: 80%; /* Bubbles can be wider */
+    padding: 8px 12px;
+    border-radius: 18px; /* More rounded bubbles */
+    margin-bottom: 8px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    display: flex; /* For avatar and content alignment */
+    position: relative; /* For timestamp positioning if needed */
+}
+.chat-bubble .profile-photo { /* For avatars next to bubbles */
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    align-self: flex-end; /* Avatar at the bottom of the bubble */
+}
+
+.chat-bubble.msg-sent {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    align-self: flex-end; /* Sent messages on the right */
+    border-bottom-right-radius: 5px; /* "Tail" effect */
+}
+.chat-bubble.msg-sent .chat-bubble-avatar {
+    margin-left: 8px;
+}
+
+
+.chat-bubble.msg-received {
+    background-color: var(--color-white); /* Received messages lighter */
+    color: var(--color-dark);
+    align-self: flex-start; /* Received messages on the left */
+    border: 1px solid var(--color-grey);
+    border-bottom-left-radius: 5px; /* "Tail" effect */
+}
+.chat-bubble.msg-received .chat-bubble-avatar {
+    margin-right: 8px;
+}
+
+.chat-bubble .bubble-content {
+    display: flex;
+    flex-direction: column;
+}
+.chat-bubble .bubble-content strong { /* Username for received messages */
+    font-size: 0.8em;
+    margin-bottom: 3px;
+    color: var(--color-primary); /* Or a different color */
+}
+.chat-bubble .bubble-content p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+.chat-bubble .bubble-content .timestamp {
+    font-size: 0.7rem;
+    margin-top: 4px;
+    align-self: flex-end; /* Timestamp to the right within the bubble */
+    opacity: 0.7;
+}
+.chat-bubble.msg-sent .bubble-content .timestamp {
+    color: var(--color-light); /* Lighter timestamp for dark bubble */
+}
+.chat-bubble.msg-received .bubble-content .timestamp {
+    color: var(--color-grey);
+}
+
+
+.chat-input-area {
+    display: flex;
+    padding: 8px 10px;
+    background-color: var(--color-white);
+    border-top: 1px solid var(--color-grey);
+}
+
+.chat-input-area .chat-message-input {
+    flex-grow: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--color-grey);
+    border-radius: 20px; /* Rounded input field */
+    resize: none;
+    height: 45px; /* Auto height based on content */
+    min-height: 22px; /* Minimum height for one line */
+    max-height: 80px; /* Max height before scrolling */
+    font-family: inherit;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    overflow-y: auto; /* Scroll if content exceeds max-height */
+}
+.chat-input-area .chat-message-input::placeholder {
+    color: var(--color-grey);
+}
+
+.chat-input-area .chat-send-btn {
+    margin-left: 8px;
+    padding: 8px 15px;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    border-radius: 20px; /* Match input field */
+    cursor: pointer;
+    font-weight: 500;
+}
+.chat-input-area .chat-send-btn:hover {
+    opacity: 0.9;
+}
+
+/* Styling for dynamic message list in home-page sidebar */
+#message-list-dynamic .message,
+#message-list-dynamic .search-result-item {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+#message-list-dynamic .message:hover,
+#message-list-dynamic .search-result-item:hover {
+    background-color: var(--color-light);
+}
+.no-messages-placeholder {
+    text-align: center;
+    color: var(--color-grey);
+    padding: 20px;
+    font-style: italic;
+}

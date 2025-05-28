@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $stmt->execute([$id_name, $username, $email, $passh, $birth]);
                 $msg = "¡Registro exitoso!";
                 $tipo = "success";
-                header("Location: home-page.php");
+                header("Location: login-page.php");
                 exit;
             }
         } catch (PDOException $e) {

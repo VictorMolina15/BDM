@@ -1,5 +1,5 @@
 <?php
-    session_start();
+session_start();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v2.1.6/css/unicons.css">
     <!-- Stylesheet -->
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/messaging.css">
 </head>
 
 <body>
@@ -23,14 +24,17 @@
         <div class="container">
             <!----------------- IZQUIERDA -------------------->
             <div class="left">
-            <a class="profile" href="profile-page.php?user=<?= $_SESSION['id_name'] ?>" style="text-decoration: none; color: var(--color-dark);">
+                <a class="profile" href="profile-page.php?user=<?= $_SESSION['id_name'] ?>"
+                    style="text-decoration: none; color: var(--color-dark);">
                     <div class="profile-photo">
-                        <img src="../assets/profile_pics/<?= $_SESSION['avatar'] ?>" alt="">
+                        <img src="<?= (!empty($_SESSION['avatar']) && $_SESSION['avatar'] !== null)
+                            ? '../assets/profile_pics/' . htmlspecialchars($_SESSION['avatar'])
+                            : '../assets/profile_pics/default-profile.png' ?>" alt="">
                     </div>
                     <div class="handle">
-                        <h4> <?php  echo $_SESSION['username'] ?? "Usuario"; ?> </h4>
+                        <h4> <?php echo $_SESSION['username'] ?? "Usuario"; ?> </h4>
                         <p class="text-muted">
-                            <?php  echo $_SESSION['id_name'] ?? "Usuario_gg"; ?> 
+                            <?php echo $_SESSION['id_name'] ?? "Usuario_gg"; ?>
                         </p>
                     </div>
                 </a>
@@ -186,7 +190,9 @@
                                     <img src="../assets/profile_pics/profile-2.jpg">
                                 </div>
                                 <div class="info">
-                                    <a href="profile-page.php?user=BrandNew_gg"><h3>Brandonsito</h3></a>
+                                    <a href="profile-page.php?user=BrandNew_gg">
+                                        <h3>Brandonsito</h3>
+                                    </a>
                                     <small>Monterrey, Nuevo León. Hace 15 minuto(s)</small>
                                 </div>
                             </div>
@@ -360,68 +366,6 @@
                         <h6>General</h6>
                         <h6 class="message-requests">solicitudes (7)</h6>
                     </div>
-                    <!------- MENSAJES ------->
-                    <a class="message"><!--probar como funciona con div y un link(a)-->
-                        <div class="profile-photo">
-                            <img src="../assets/profile_pics/profile-4.jpg">
-                        </div>
-                        <div class="message-body">
-                            <h5>Random</h5>
-                            <p class="text-muted">auxilio</p>
-                        </div>
-                    </a>
-                    <!------- MENSAJES ------->
-                    <div class="message">
-                        <div class="profile-photo">
-                            <img src="../assets/profile_pics/profile-6.png">
-                        </div>
-                        <div class="message-body">
-                            <h5>Random</h5>
-                            <p class="text-bold">2 Mensajes nuevos</p>
-                        </div>
-                    </div>
-                    <!------- MENSAJES ------->
-                    <div class="message">
-                        <div class="profile-photo">
-                            <img src="../assets/profile_pics/profile-7.png">
-                            <div class="active"></div>
-                        </div>
-                        <div class="message-body">
-                            <h5>Random</h5>
-                            <p class="text-muted">estoy cansada</p>
-                        </div>
-                    </div>
-                    <!------- MENSAJES ------->
-                    <div class="message">
-                        <div class="profile-photo">
-                            <img src="../assets/profile_pics/profile-2.jpg">
-                        </div>
-                        <div class="message-body">
-                            <h5>Random</h5>
-                            <p class="text-muted">salvame Dios</p>
-                        </div>
-                    </div>
-                    <!------- MENSAJES ------->
-                    <div class="message">
-                        <div class="profile-photo">
-                            <img src="../assets/profile_pics/profile-3.jpg">
-                            <div class="active"></div>
-                        </div>
-                        <div class="message-body">
-                            <h5>Random</h5>
-                            <p class="text-bold">5 Mensajes nuevos</p>
-                        </div>
-                    </div>
-                    <!------- MENSAJES ------->
-                    <div class="message">
-                        <div class="profile-photo">
-                            <img src="../assets/profile_pics/profile-8.png">
-                        </div>
-                        <div class="message-body">
-                            <h5>Random</h5>
-                            <p class="text-muted">XDDD</p>
-                        </div>
-                    </div>
                 </div>
                 <!------- FIN DE MENSAJES ------->
 
@@ -550,14 +494,32 @@
         <div class="card">
             <h2>Ajustes</h2><br>
             <ul>
-                <li><p>Configuración de Notificaciones</p></li>
-                <li><p>Administrar Bloqueos/Reportes</p></li>
-                <li><p>Ver actividad Reciente</p></li>
-                <li onclick="location='back-end/session-end.php'"><p>Cerrar Sesión</p></li>
+                <li>
+                    <p>Configuración de Notificaciones</p>
+                </li>
+                <li>
+                    <p>Administrar Bloqueos/Reportes</p>
+                </li>
+                <li>
+                    <p>Ver actividad Reciente</p>
+                </li>
+                <li onclick="location='back-end/session-end.php'">
+                    <p>Cerrar Sesión</p>
+                </li>
             </ul>
         </div>
     </div>
     <script src="../js/homepage.js"></script>
+    <script>
+        const currentLoggedInUserId = "<?php echo htmlspecialchars($_SESSION['id_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>";
+        const loggedInUser = {
+            id_name: "<?php echo htmlspecialchars($_SESSION['id_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>",
+            username: "<?php echo htmlspecialchars($_SESSION['username'] ?? '', ENT_QUOTES, 'UTF-8'); ?>",
+            // Ensure 'avatar' is the correct session variable key for the profile picture filename
+            avatar: "<?php echo htmlspecialchars($_SESSION['avatar'] ?? 'default-profile.png', ENT_QUOTES, 'UTF-8'); ?>"
+        };
+    </script>
+    <script src="../js/messaging.js"></script>
 </body>
 
 </html>

@@ -123,3 +123,114 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+-- ================CHATS==========================
+DELIMITER $$
+
+-- Obtiene todos los chats del Usuario y elementos para mostrarlos en el preview
+CREATE PROCEDURE sp_GetChatsForUser(
+    IN p_user_id VARCHAR(15)
+)
+BEGIN
+    SELECT
+        c.id AS chat_id,
+        IF(c.user1_id = p_user_id, c.user2_id, c.user1_id) AS other_user_id,
+        u.username AS other_username,
+        u.profile_picture AS other_user_avatar,
+        (SELECT content FROM message msg WHERE msg.chat_id = c.id ORDER BY msg.created_at DESC LIMIT 1) AS last_message_content,
+        (SELECT created_at FROM message msg WHERE msg.chat_id = c.id ORDER BY msg.created_at DESC LIMIT 1) AS last_message_time
+    FROM chat c
+    JOIN users u ON u.id_name = IF(c.user1_id = p_user_id, c.user2_id, c.user1_id)
+    WHERE c.user1_id = p_user_id OR c.user2_id = p_user_id
+    ORDER BY last_message_time DESC;
+END$$
+
+-- Obtiene mensajes en Chats especificos con paginación
+CREATE PROCEDURE sp_GetMessagesForChat(
+    IN p_chat_id INT,
+    IN p_limit INT,
+    IN p_offset INT
+)
+BEGIN
+    SELECT
+        m.id AS message_id,
+        m.author_id,
+        u.username AS author_username,
+        u.profile_picture AS author_avatar,
+        m.content,
+        m.created_at
+    FROM message m
+    JOIN users u ON m.author_id = u.id_name
+    WHERE m.chat_id = p_chat_id
+    ORDER BY m.created_at ASC
+    LIMIT p_limit OFFSET p_offset;
+END$$
+
+-- Send a new message
+CREATE PROCEDURE sp_SendMessage(
+    IN p_chat_id INT,
+    IN p_author_id VARCHAR(15),
+    IN p_content TEXT,
+    OUT p_message_id INT
+)
+BEGIN
+    INSERT INTO message (chat_id, author_id, content, created_at)
+    VALUES (p_chat_id, p_author_id, p_content, NOW());
+    SET p_message_id = LAST_INSERT_ID();
+
+    -- Selecciona el último mensaje enviado para mostrarlo inmediatamente
+    SELECT
+        p_message_id AS message_id,
+        p_author_id AS author_id,
+        (SELECT username FROM users WHERE id_name = p_author_id) AS author_username,
+        (SELECT profile_picture FROM users WHERE id_name = p_author_id) AS author_avatar,
+        p_content AS content,
+        NOW() AS created_at;
+END$$
+
+-- Crear Chat si no existe, o obtener una existente
+CREATE PROCEDURE sp_CreateOrGetChat(
+    IN p_user1_id VARCHAR(15),
+    IN p_user2_id VARCHAR(15)
+)
+BEGIN
+    DECLARE v_chat_id INT;
+
+    IF p_user1_id = p_user2_id THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot create a chat with oneself.';
+    END IF;
+
+    IF p_user1_id > p_user2_id THEN
+        SET @temp_id = p_user1_id;
+        SET p_user1_id = p_user2_id;
+        SET p_user2_id = @temp_id;
+    END IF;
+
+    SELECT id INTO v_chat_id
+    FROM chat
+    WHERE user1_id = p_user1_id AND user2_id = p_user2_id
+    LIMIT 1;
+
+    IF v_chat_id IS NULL THEN
+        INSERT INTO chat (user1_id, user2_id) VALUES (p_user1_id, p_user2_id);
+        SET v_chat_id = LAST_INSERT_ID();
+    END IF;
+    SELECT v_chat_id AS chat_id;
+END$$
+
+-- Buscar Usuarios para Chatear (adaptandose a sp_SearchUser)
+CREATE PROCEDURE sp_SearchUsersForChat(
+    IN p_current_user_id VARCHAR(15),
+    IN p_search_term VARCHAR(50)
+)
+BEGIN
+    SELECT
+        id_name,
+        username,
+        profile_picture
+    FROM users
+    WHERE (id_name LIKE CONCAT('%', p_search_term, '%') OR username LIKE CONCAT('%', p_search_term, '%'))
+      AND id_name != p_current_user_id;
+END$$
+
+DELIMITER ;

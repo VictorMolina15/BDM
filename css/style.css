@@ -579,7 +579,7 @@ main .container .right {
     gap: 1rem;
 }
 /* =============== Modal Perfil ============== */
-.profile-modal, .settings-modal, .customize-theme{ 
+.modal, .settings-modal, .customize-theme{ 
     background: rgba(0, 0, 0, 0.5);
     width: 100vw;
     height: 100vh;
@@ -592,10 +592,10 @@ main .container .right {
     place-items: center;
     display: none;
 }
-.profile-modal{
+.modal{
     z-index: 5;
 }
-.profile-modal .card{
+.modal .card{
     background: var(--color-white);
     padding: 2px;
     border-radius: var(--card-border-radius);
@@ -606,20 +606,20 @@ main .container .right {
     right: 8%;
     border: 2px solid var(--color-secondary);
 }
-.profile-modal li{
+.modal li{
     border-radius: var(--card-border-radius);
     margin: 5px;
     cursor: pointer;
 }
-.profile-modal li:hover{
+.modal li:hover{
     background: var(--color-light);
     transition: all 500ms ease;
 }
-.profile-modal a{
+.modal a{
     color: var(--color-dark);
     text-decoration: none;
 }
-.profile-modal a:hover{
+.modal a:hover{
     color: var(--color-primary);
 }
 /* =============== Ajustes ============== */
