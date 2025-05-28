@@ -19,6 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($userdata && password_verify($pass, $userdata['pass'])) {
         $_SESSION['id_name'] = $userdata['id_name'];
         $_SESSION['username'] = $userdata['username'];
+        $_SESSION['avatar'] = $userdata['profile_picture'];
 
         header("Location: home-page.php"); // Redirigir a la página principal
 

@@ -25,7 +25,7 @@
             <div class="left">
             <a class="profile" href="profile-page.php?user=<?= $_SESSION['id_name'] ?>" style="text-decoration: none; color: var(--color-dark);">
                     <div class="profile-photo">
-                        <img src="../assets/profile_pics/profile-1.png" alt="">
+                        <img src="../assets/profile_pics/<?= $_SESSION['avatar'] ?>" alt="">
                     </div>
                     <div class="handle">
                         <h4> <?php  echo $_SESSION['username'] ?? "Usuario"; ?> </h4>

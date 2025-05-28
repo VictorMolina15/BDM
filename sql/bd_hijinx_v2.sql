@@ -10,6 +10,10 @@ CREATE TABLE users (
     pass VARCHAR(255) NOT NULL,
     birth DATE NOT NULL,
     profile_picture VARCHAR(255),
+    cover_picture VARCHAR(255) NULL,
+    location VARCHAR(100) NULL,
+    education VARCHAR(100) NULL,
+    biography VARCHAR(100) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -78,8 +82,11 @@ CREATE TABLE communities (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name_comm VARCHAR(100) NOT NULL,
     descrip TEXT,
+    community_picture VARCHAR(255) NULL,
+    cover_picture VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 
 -- Tabla de Miembros de Comunidad
 CREATE TABLE community_members (

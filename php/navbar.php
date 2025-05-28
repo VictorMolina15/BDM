@@ -12,7 +12,9 @@
         <div class="create">
             <label class="btn btn-primary" for="create-post">Crear</label>
             <div class="profile-photo" style="cursor:pointer" id="user-top-photo">
-                <img src="../assets/profile_pics/profile-1.png" alt="">
+                <img src="<?=(!empty($_SESSION['avatar']) && $_SESSION['avatar'] !== null) 
+                ? '../assets/profile_pics/' . htmlspecialchars($_SESSION['avatar']) 
+                : '../assets/profile_pics/default-profile.png' ?>" alt="">
             </div>
         </div>
     </div>
