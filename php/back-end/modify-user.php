@@ -124,7 +124,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['profile_id_to_modify'
 
     $db_cover_pic_name = $currentUserData['cover_picture']; // Nombre actual en BD o NULL
     if (isset($_FILES['cover_pic']) && $_FILES['cover_pic']['error'] == UPLOAD_ERR_OK && $_FILES['cover_pic']['size'] > 0) {
-        $target_dir_cover = "../../assets/cover-img/";
+        $target_dir_cover = "../../assets/cover_img/";
         if (!is_dir($target_dir_cover)) {
             mkdir($target_dir_cover, 0777, true);
         }
