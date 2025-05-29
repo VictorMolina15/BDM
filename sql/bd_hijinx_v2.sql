@@ -38,6 +38,7 @@ CREATE TABLE posts (
     FOREIGN KEY (user_id) REFERENCES users(id_name) ON DELETE CASCADE
 );
 
+
 -- Tabla para Multiples Likes
 CREATE TABLE post_likes (
     post_id INT,
@@ -98,9 +99,7 @@ CREATE TABLE communities (
     descrip TEXT,
     community_picture VARCHAR(255) NULL,
     cover_picture VARCHAR(255),
-    creator_id VARCHAR(15) NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	FOREIGN KEY (creator_id) REFERENCES users(id_name) ON DELETE SET NULL
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Tabla de Miembros de Comunidad
@@ -108,7 +107,6 @@ CREATE TABLE community_members (
     community_id INT,
     user_id VARCHAR(15),
     role_type ENUM('member', 'admin') DEFAULT 'member',
-    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (community_id, user_id),
     FOREIGN KEY (community_id) REFERENCES communities(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id_name) ON DELETE CASCADE
@@ -147,6 +145,26 @@ CREATE TABLE reports (
     FOREIGN KEY (reporting_user_id) REFERENCES users(id_name) ON DELETE CASCADE,
     FOREIGN KEY (reporting_post_id) REFERENCES posts(id) ON DELETE CASCADE
 );
--- Consulta --
-select * from users;
+-- ========= Consultas Complementarias ============ --
+-- tabla community members
+ALTER TABLE community_members
+ADD COLUMN joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP AFTER role_type;
+
+-- En la tabla communities
+ALTER TABLE communities
+ADD COLUMN creator_id VARCHAR(15) NULL AFTER cover_picture,
+ADD CONSTRAINT fk_community_creator
+    FOREIGN KEY (creator_id) REFERENCES users(id_name);
+
+-- En la tabla posts
+ALTER TABLE posts
+ADD COLUMN community_id INT NULL AFTER created_at,
+ADD CONSTRAINT fk_post_community
+    FOREIGN KEY (community_id) REFERENCES communities(id) ON DELETE SET NULL; -- Si se borra la comunidad, los posts quedan sin comunidad_id
+    
+-- índices
+CREATE INDEX idx_post_community ON posts(community_id);
+CREATE INDEX idx_community_creator ON communities(creator_id);
+    
+
 

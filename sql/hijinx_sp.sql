@@ -840,6 +840,7 @@ BEGIN
     END IF;
 END$$
 
+
 -- Modificar sp_CreatePost para incluir community_id
 DROP PROCEDURE IF EXISTS sp_CreatePost$$
 CREATE PROCEDURE sp_CreatePost(
@@ -903,5 +904,119 @@ SELECT
 FROM posts p
 JOIN users u ON p.user_id = u.id_name
 LEFT JOIN multimedia m ON p.id = m.post_id$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_GetCommunityDetails(
+    IN p_community_id_to_view INT,
+    IN p_current_user_id VARCHAR(15) -- El ID del usuario que está viendo la página de la comunidad
+)
+BEGIN
+    SELECT
+        c.id,
+        c.name_comm,
+        c.descrip,
+        c.community_picture,
+        c.cover_picture,
+        c.creator_id,
+        u_creator.username AS creator_username, -- Nombre del creador
+        u_creator.profile_picture AS creator_avatar, -- Avatar del creador (opcional)
+        c.created_at,
+        (SELECT COUNT(*) FROM community_members cm WHERE cm.community_id = c.id) AS member_count,
+        (SELECT cm_user.role_type FROM community_members cm_user WHERE cm_user.community_id = c.id AND cm_user.user_id = p_current_user_id LIMIT 1) AS current_user_role,
+        EXISTS(SELECT 1 FROM community_members cm_user_exists WHERE cm_user_exists.community_id = c.id AND cm_user_exists.user_id = p_current_user_id) AS is_member
+    FROM communities c
+    LEFT JOIN users u_creator ON c.creator_id = u_creator.id_name -- Unir con users para obtener datos del creador
+    WHERE c.id = p_community_id_to_view
+    LIMIT 1; -- Asegura que solo devuelva una fila si por alguna razón hubiera IDs duplicados (no debería si es PK)
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_GetCommunityFeedPosts(
+    IN p_current_user_id VARCHAR(15), -- Usuario que realiza la visualización (para filtros de bloqueo)
+    IN p_community_id_to_view INT,  -- El ID de la comunidad cuyos posts se quieren ver
+    IN p_limit INT,
+    IN p_offset INT
+)
+BEGIN
+    SELECT v.*
+    FROM view_post_feed_details v -- Utiliza la vista que ya incluye detalles del post y del autor
+    WHERE
+        v.community_id = p_community_id_to_view -- Condición principal: posts de ESTA comunidad
+        -- Lógica de Bloqueo (copiada de tu sp_GetFeedPosts existente)
+        AND v.author_id NOT IN ( -- Excluir posts de usuarios bloqueados por el usuario actual
+            SELECT rep.reported_user_id
+            FROM reports rep
+            WHERE rep.reporting_user_id = p_current_user_id AND rep.reported_user_id IS NOT NULL
+        )
+        AND v.post_id NOT IN ( -- Excluir posts específicos bloqueados por el usuario actual
+            SELECT rep.reporting_post_id
+            FROM reports rep
+            WHERE rep.reporting_user_id = p_current_user_id AND rep.reporting_post_id IS NOT NULL
+        )
+        AND v.author_id NOT IN ( -- Excluir posts de usuarios que han bloqueado al usuario actual
+             SELECT rep.reporting_user_id
+             FROM reports rep
+             WHERE rep.reported_user_id = p_current_user_id AND rep.reporting_user_id IS NOT NULL
+        )
+    ORDER BY v.created_at DESC
+    LIMIT p_limit OFFSET p_offset;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS sp_JoinCommunity$$
+CREATE PROCEDURE sp_JoinCommunity(
+    IN p_user_id VARCHAR(15),
+    IN p_community_id INT
+)
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM communities WHERE id = p_community_id) THEN
+        SELECT 'error' AS status, 'La comunidad no existe.' AS message;
+    ELSEIF EXISTS (SELECT 1 FROM community_members WHERE community_id = p_community_id AND user_id = p_user_id) THEN
+        SELECT 'success' AS status, 'Ya eres miembro de esta comunidad.' AS message; -- Considerado éxito si ya es miembro
+    ELSE
+        INSERT INTO community_members (community_id, user_id, role_type, joined_at)
+        VALUES (p_community_id, p_user_id, 'member', NOW());
+        SELECT 'success' AS status, 'Te has unido a la comunidad exitosamente.' AS message;
+    END IF;
+END$$
+
+DROP PROCEDURE IF EXISTS sp_LeaveCommunity$$
+CREATE PROCEDURE sp_LeaveCommunity(
+    IN p_user_id VARCHAR(15),
+    IN p_community_id INT
+)
+BEGIN
+    DECLARE member_role ENUM('member', 'admin');
+    DECLARE admin_count INT;
+
+    IF NOT EXISTS (SELECT 1 FROM community_members WHERE community_id = p_community_id AND user_id = p_user_id) THEN
+        SELECT 'success' AS status, 'No eres miembro de esta comunidad (o ya la has abandonado).' AS message; -- Éxito si no es miembro
+    ELSE
+        SELECT role_type INTO member_role FROM community_members WHERE community_id = p_community_id AND user_id = p_user_id;
+
+        IF member_role = 'admin' THEN
+            SELECT COUNT(*) INTO admin_count FROM community_members WHERE community_id = p_community_id AND role_type = 'admin';
+            IF admin_count <= 1 THEN
+                -- En lugar de SIGNAL, devolvemos un error que PHP pueda manejar
+                SELECT 'error' AS status, 'No puedes abandonar la comunidad. Eres el único administrador.' AS message;
+            ELSE
+                DELETE FROM community_members WHERE community_id = p_community_id AND user_id = p_user_id;
+                SELECT 'success' AS status, 'Has abandonado la comunidad exitosamente.' AS message;
+            END IF;
+        ELSE
+            DELETE FROM community_members WHERE community_id = p_community_id AND user_id = p_user_id;
+            SELECT 'success' AS status, 'Has abandonado la comunidad exitosamente.' AS message;
+        END IF;
+    END IF;
+END$$
 
 DELIMITER ;
