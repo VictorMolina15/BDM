@@ -37,6 +37,17 @@ CREATE TABLE posts (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id_name) ON DELETE CASCADE
 );
+
+-- Tabla para Multiples Likes
+CREATE TABLE post_likes (
+    post_id INT,
+    user_id VARCHAR(15),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (post_id, user_id),
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id_name) ON DELETE CASCADE
+);
+
 -- Tabla de Historias
 CREATE TABLE stories (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -63,8 +74,10 @@ CREATE TABLE multimedia (
     id INT AUTO_INCREMENT PRIMARY KEY,
     post_id INT,
 	media VARCHAR(255),
+    media_type ENUM('image', 'video') NOT NULL COMMENT 'Tipo de archivo',
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
 );
+
 
 -- Tabla de Comentarios
 CREATE TABLE comments (

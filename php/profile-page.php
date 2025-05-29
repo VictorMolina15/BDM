@@ -1,4 +1,5 @@
-<?php require_once 'back-end/connection.php';
+<?php
+require_once 'back-end/connection.php';
 require_once 'back-end/verified-session.php';
 $db = new DBConnection();
 $conn = $db->getConnection();
@@ -270,58 +271,124 @@ if (isset($_SESSION['edit_feedback_msg'])) {
                     <h3>Publicaciones</3>
                 </div>
                 <div class="feeds">
-                    <!-------- Feed De Ejemplo -------->
-                    <div class="feed">
+                    <!--------- Feed Dinámico --------------->
+                    <?php
+                    require_once 'back-end/utils.php';
+                    $profile_to_view = $viewedUserId;
+
+                    $limit = 10; // Or however many posts per page
+                    $offset = 0; // Implement pagination later if needed
+                    $stmt_feed = $conn->prepare("CALL sp_GetFeedPosts(?, ?, ?, ?)");
+                    $stmt_feed->execute([$_SESSION['id_name'], $profile_to_view, $limit, $offset]);
+                    $feed_posts = $stmt_feed->fetchAll(PDO::FETCH_ASSOC);
+                    $stmt_feed->closeCursor();
+
+                    if (count($feed_posts) > 0) {
+                        foreach ($feed_posts as $post) {
+                            $post_id = htmlspecialchars($post['post_id']);
+                            $author_id_name = htmlspecialchars($post['author_id']);
+                            $author_username = htmlspecialchars($post['author_username']);
+                            $author_avatar_filename = $post['author_avatar'] ?? 'default-profile.png';
+                            $author_avatar_url = '../assets/profile_pics/' . htmlspecialchars($author_avatar_filename);
+                            $post_content = nl2br(htmlspecialchars($post['content'])); // nl2br to respect newlines
+                            $post_likes = (int) $post['likes'];
+                            $post_created_at = formatTimeAgo($post['created_at']);
+
+                            $media_html = '';
+                            if (!empty($post['media_path'])) {
+                                $media_url = '../assets/post_media/' . htmlspecialchars($post['media_path']);
+                                if ($post['media_type'] === 'image') {
+                                    $media_html = "<div class=\"photo\"><img src=\"{$media_url}\" alt=\"Post media\"></div>";
+                                } elseif ($post['media_type'] === 'video') {
+                                    $media_html = "<div class=\"photo\"><video controls src=\"{$media_url}\" style=\"width:100%; border-radius: var(--card-border-radius);\"></video></div>";
+                                }
+                            }
+                            // Verificar si el usuario actual ha dado "Me gusta" a este post
+                            $user_has_liked_post_stmt = $conn->prepare("SELECT func_HasUserLikedPost(:user_id, :post_id) AS has_liked");
+                            $user_has_liked_post_stmt->execute(['user_id' => $_SESSION['id_name'], 'post_id' => $post['post_id']]);
+                            $like_status = $user_has_liked_post_stmt->fetch(PDO::FETCH_ASSOC);
+                            $user_has_liked_this_post = (bool) ($like_status['has_liked'] ?? false);
+                            $user_has_liked_post_stmt->closeCursor();
+                            ?>
+                    <div class="feed" data-post-id="<?= $post_id ?>">
                         <div class="head">
                             <div class="user">
                                 <div class="profile-photo">
-                                    <img src="../assets/profile_pics/profile-1.png">
+                                    <img src="<?= $author_avatar_url ?>" alt="<?= $author_username ?>">
                                 </div>
                                 <div class="info">
-                                    <h3>Random</h3>
-                                    <small>Hace 50 minutos</small>
+                                    <a href="profile-page.php?user=<?= $author_id_name ?>"
+                                        style="color: var(--color-dark); text-decoration: none;">
+                                        <h3>
+                                            <?= $author_username ?>
+                                        </h3>
+                                    </a>
+                                    <small>
+                                        <?= $post_created_at ?>
+                                    </small>
                                 </div>
                             </div>
                             <span class="edit">
                                 <i class="uil uil-ellipsis-h"></i>
+                                <ul class="edit-menu"
+                                    style="display:none; position:absolute; background:var(--color-white); border-radius:var(--card-border-radius); box-shadow: 0 0 5px rgba(0,0,0,0.1); padding: 5px; right:0; top:100%; z-index:10;">
+                                    <?php if ($post['author_id'] === $_SESSION['id_name']): ?>
+                                    <?php else: ?>
+                                    <li style="padding: 5px 10px; cursor:pointer;" class="block-post-option"
+                                        data-post-id="<?= $post_id ?>">Bloquear Publicación</li>
+                                    <?php endif; ?>
+                                </ul>
                             </span>
                         </div>
+                        <?php if (!empty($post_content)): ?>
                         <div class="description">
-                            <p>Achicopalado</p>
+                            <p>
+                                <?= $post_content ?>
+                            </p>
                         </div>
-                        <div class="photo">
-                            <img src="../assets/post_img/post-3.jpg">
-                        </div>
+                        <?php endif; ?>
+                        <?= $media_html ?>
 
                         <div class="action-buttons">
                             <div class="interaction-buttons">
-                                <span><i class="uil uil-heart"></i></span>
-                                <span><i class="uil uil-comment-dots"></i></span>
-                                <span><i class="uil uil-share-alt"></i></span>
+                                <span class="like-btn" data-post-id="<?= $post_id ?>" title="Me gusta">
+                                    <i class="uil <?= $user_has_liked_this_post ? 'uil-heart' : 'uil-heart-alt' ?>"
+                                        style="color: <?= $user_has_liked_this_post ? 'var(--color-danger)' : 'inherit' ?>;"></i>
+                                </span>
+                                <span class="comment-btn" data-post-id="<?= $post_id ?>" title="Comentar">
+                                    <i class="uil uil-comment-dots"></i>
+                                </span>
                             </div>
-                            <div class="bookmark">
-                                <span><i class="uil uil-bookmark-full"></i></span>
+                        </div>
+
+                        <div class="liked-by" data-post-id="<?= $post_id ?>">
+                            <p><b class="like-count">
+                                    <?= $post_likes ?>
+                                </b> persona(s) le gusta esto</p>
+                        </div>
+
+                        <div class="comments-section" data-post-id="<?= $post_id ?>" style="margin-top:10px;">
+                            <div class="existing-comments">
                             </div>
-                        </div>
-
-                        <div class="liked-by">
-                            <span><img src="../assets/profile_pics/profile-12.jpg"></span>
-                            <span><img src="../assets/profile_pics/profile-9.jpg"></span>
-                            <span><img src="../assets/profile_pics/profile-2.jpg"></span>
-                            <p>Le gusta a <b>Random</b> y <b>Otros 5,179</b></p>
-                        </div>
-
-                        <div class="caption">
-                            <p><b>Random</b> yo ese
-                                <span class="harsh-tag"></span>
-                            </p>
-                        </div>
-
-                        <div class="comments text-muted">
-                            Ver todos los 408 comentarios
+                            <button class="view-more-comments-btn btn text-muted" data-post-id="<?= $post_id ?>"
+                                data-offset="0" style="display:none; margin-top:5px; font-size: 0.8rem;">Ver más
+                                comentarios</button>
+                            <form class="comment-form" data-post-id="<?= $post_id ?>"
+                                style="margin-top: 10px; display: flex; gap: 5px;">
+                                <input type="text" name="comment_content" class="comment-input"
+                                    placeholder="Escribe un comentario..."
+                                    style="flex-grow: 1; padding: 8px; border: 1px solid var(--color-grey); border-radius: 20px; font-size:0.85rem;">
+                                <button type="submit" class="btn btn-primary"
+                                    style="padding: 8px 12px; font-size:0.85rem;">Enviar</button>
+                            </form>
                         </div>
                     </div>
-                    <!-------- Fin del Feed -------->
+                    <?php
+                        } // End foreach
+                    } else {
+                        echo "<p class='text-muted' style='text-align:center; padding: 2rem;'>No hay publicaciones para mostrar.</p>";
+                    }
+                    ?>
                 </div>
             </div>
         </div>
@@ -524,14 +591,14 @@ if (isset($_SESSION['edit_feedback_msg'])) {
     const blockUserProfileBtn = document.getElementById('block-user-profile-btn');
 
     if (blockUserProfileBtn) {
-        blockUserProfileBtn.addEventListener('click', function() {
+        blockUserProfileBtn.addEventListener('click', function () {
             const profileId = this.dataset.profileId;
             const reason = prompt("Motivo del bloqueo/reporte (opcional):");
             // No enviar si el usuario cancela el prompt
             if (reason === null) {
                 return;
             }
-            
+
             const formData = new FormData();
             formData.append('action', 'block_user');
             formData.append('reported_user_id', profileId);
@@ -543,22 +610,23 @@ if (isset($_SESSION['edit_feedback_msg'])) {
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
-            .then(result => {
-                alert(result.message);
-                if (result.status === 'success') {
-                    // Podrías cambiar el texto del botón o deshabilitarlo
-                    this.textContent = 'Usuario Bloqueado';
-                    this.disabled = true;
-                }
-            })
-            .catch(error => {
-                console.error('Error al bloquear usuario:', error);
-                alert('Error de red al bloquear usuario.');
-            });
+                .then(response => response.json())
+                .then(result => {
+                    alert(result.message);
+                    if (result.status === 'success') {
+                        // Podrías cambiar el texto del botón o deshabilitarlo
+                        this.textContent = 'Usuario Bloqueado';
+                        this.disabled = true;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al bloquear usuario:', error);
+                    alert('Error de red al bloquear usuario.');
+                });
         });
     }
 </script>
 <script src="../js/messaging.js"></script>
+<script src="../js/post_actions.js"></script>
 
 </html>

@@ -599,3 +599,203 @@ BEGIN
       );
 END$$
 DELIMITER ;
+
+
+DELIMITER $$
+
+-- Create a Post (with optional media)
+CREATE PROCEDURE sp_CreatePost(
+    IN p_user_id VARCHAR(15),
+    IN p_content TEXT,
+    IN p_media_path VARCHAR(255),
+    IN p_media_type ENUM('image', 'video', 'none') -- 'none' if no media
+)
+BEGIN
+    DECLARE v_post_id INT;
+
+    INSERT INTO posts (user_id, content, likes, created_at)
+    VALUES (p_user_id, p_content, 0, NOW());
+
+    SET v_post_id = LAST_INSERT_ID();
+
+    IF p_media_path IS NOT NULL AND p_media_type != 'none' THEN
+        INSERT INTO multimedia (post_id, media, media_type)
+        VALUES (v_post_id, p_media_path, p_media_type);
+    END IF;
+
+    -- Return the created post details for immediate display (optional)
+    SELECT
+        p.id AS post_id,
+        p.user_id,
+        u.username AS author_username,
+        u.profile_picture AS author_avatar,
+        p.content,
+        p.likes,
+        p.created_at,
+        m.media AS media_path,
+        m.media_type
+    FROM posts p
+    JOIN users u ON p.user_id = u.id_name
+    LEFT JOIN multimedia m ON p.id = m.post_id
+    WHERE p.id = v_post_id;
+END$$
+
+-- View for simplified post fetching (recommended)
+CREATE OR REPLACE VIEW view_post_feed_details AS
+SELECT
+    p.id AS post_id,
+    p.user_id AS author_id,
+    u.username AS author_username,
+    u.profile_picture AS author_avatar,
+    p.content,
+    p.likes,
+    p.created_at,
+    m.media AS media_path,
+    m.media_type
+FROM posts p
+JOIN users u ON p.user_id = u.id_name
+LEFT JOIN multimedia m ON p.id = m.post_id
+$$
+
+-- Modify sp_GetFeedPosts to use the view and include media
+DROP PROCEDURE IF EXISTS sp_GetFeedPosts$$
+CREATE PROCEDURE sp_GetFeedPosts(
+    IN p_current_user_id VARCHAR(15),
+    IN p_profile_user_id VARCHAR(15), -- NULL for general feed, specific user_id for profile feed
+    IN p_limit INT,
+    IN p_offset INT
+)
+BEGIN
+    SELECT v.*
+    FROM view_post_feed_details v
+    WHERE
+        (
+            -- For a specific user's profile page (show all their posts)
+            (p_profile_user_id IS NOT NULL AND v.author_id = p_profile_user_id)
+            OR
+            -- For the general homepage feed (own posts + friends' posts)
+            (p_profile_user_id IS NULL AND
+                (
+                    v.author_id = p_current_user_id OR
+                    v.author_id IN (SELECT friend_id FROM friends WHERE user_id = p_current_user_id AND stat = 'accepted')
+                )
+            )
+        )
+        -- Blocking Logic (copied from your existing sp_GetFeedPosts)
+        AND v.author_id NOT IN (
+            SELECT rep.reported_user_id
+            FROM reports rep
+            WHERE rep.reporting_user_id = p_current_user_id AND rep.reported_user_id IS NOT NULL
+        )
+        AND v.post_id NOT IN (
+            SELECT rep.reporting_post_id
+            FROM reports rep
+            WHERE rep.reporting_user_id = p_current_user_id AND rep.reporting_post_id IS NOT NULL
+        )
+        AND v.author_id NOT IN (
+             SELECT rep.reporting_user_id
+             FROM reports rep
+             WHERE rep.reported_user_id = p_current_user_id AND rep.reporting_user_id IS NOT NULL
+        )
+    ORDER BY v.created_at DESC
+    LIMIT p_limit OFFSET p_offset;
+END$$
+
+-- Add a Comment
+CREATE PROCEDURE sp_AddComment(
+    IN p_post_id INT,
+    IN p_user_id VARCHAR(15),
+    IN p_content TEXT,
+    OUT p_comment_id INT
+)
+BEGIN
+    INSERT INTO comments (post_id, user_id, content, likes, created_at)
+    VALUES (p_post_id, p_user_id, p_content, 0, NOW());
+    SET p_comment_id = LAST_INSERT_ID();
+
+    SELECT c.id, c.post_id, c.user_id, u.username as commenter_username, u.profile_picture as commenter_avatar, c.content, c.likes, c.created_at
+    FROM comments c
+    JOIN users u ON c.user_id = u.id_name
+    WHERE c.id = p_comment_id;
+END$$
+
+-- Get Comments for a Post
+CREATE PROCEDURE sp_GetCommentsForPost(
+    IN p_post_id INT,
+    IN p_limit INT,
+    IN p_offset INT
+)
+BEGIN
+    SELECT c.id, c.post_id, c.user_id, u.username as commenter_username, u.profile_picture as commenter_avatar, c.content, c.likes, c.created_at
+    FROM comments c
+    JOIN users u ON c.user_id = u.id_name
+    WHERE c.post_id = p_post_id
+    ORDER BY c.created_at ASC -- Or DESC if you prefer newest first
+    LIMIT p_limit OFFSET p_offset;
+END$$
+
+DELIMITER $$
+
+-- Alternar el "Me Gusta" de un usuario en un post
+CREATE PROCEDURE sp_TogglePostLike(
+    IN p_post_id INT,
+    IN p_user_id_liking VARCHAR(15)
+)
+BEGIN
+    DECLARE v_liked_already BOOLEAN;
+
+    -- Verificar si el usuario ya le dio "Me Gusta"
+    SELECT EXISTS(SELECT 1 FROM post_likes WHERE post_id = p_post_id AND user_id = p_user_id_liking) INTO v_liked_already;
+
+    IF v_liked_already THEN
+        -- Ya le dio "Me Gusta", entonces quitarlo (Unlike)
+        DELETE FROM post_likes WHERE post_id = p_post_id AND user_id = p_user_id_liking;
+    ELSE
+        -- No le ha dado "Me Gusta", entonces agregarlo (Like)
+        INSERT INTO post_likes (post_id, user_id) VALUES (p_post_id, p_user_id_liking);
+    END IF;
+
+    -- Devolver el nuevo estado y conteo de "Me Gusta"
+    SELECT
+        (SELECT COUNT(*) FROM post_likes WHERE post_id = p_post_id) AS new_like_count,
+        NOT v_liked_already AS liked_status; -- Si antes estaba likeado (v_liked_already=TRUE), ahora el status es FALSE (no likeado)
+
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER trg_after_post_like_insert
+AFTER INSERT ON post_likes
+FOR EACH ROW
+BEGIN
+    UPDATE posts SET likes = likes + 1 WHERE id = NEW.post_id;
+END$$
+
+CREATE TRIGGER trg_after_post_like_delete
+AFTER DELETE ON post_likes
+FOR EACH ROW
+BEGIN
+    UPDATE posts SET likes = CASE WHEN likes > 0 THEN likes - 1 ELSE 0 END WHERE id = OLD.post_id;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE FUNCTION func_HasUserLikedPost(
+    p_user_id_checking VARCHAR(15),
+    p_post_id_to_check INT
+)
+RETURNS BOOLEAN
+DETERMINISTIC
+READS SQL DATA
+BEGIN
+    DECLARE v_has_liked BOOLEAN DEFAULT FALSE;
+    SELECT EXISTS(SELECT 1 FROM post_likes WHERE post_id = p_post_id_to_check AND user_id = p_user_id_checking) INTO v_has_liked;
+    RETURN v_has_liked;
+END$$
+
+DELIMITER ;
+

@@ -22,6 +22,7 @@ require_once 'back-end/verified-session.php'
 <body>
     <?php include 'navbar.php'; ?>
     <!-------------------------------- MAIN ----------------------------------->
+    <section id="Inicio"></section>
     <main>
         <div class="container">
             <!----------------- IZQUIERDA -------------------->
@@ -43,83 +44,13 @@ require_once 'back-end/verified-session.php'
 
                 <!----------------- SIDEBAR -------------------->
                 <div class="sidebar">
-                    <a class="menu-item active">
+                    <a href="#Inicio" class="menu-item active" style="color: var(--color-dark);">
                         <span><i class="uil uil-home"></i></span>
                         <h3>Inicio</h3>
                     </a>
-                    <a class="menu-item">
-                        <span><i class="uil uil-compass"></i></span>
-                        <h3>Descubrir</h3>
-                    </a>
-                    <a class="menu-item" id="notifications">
-                        <span><i class="uil uil-bell"><small class="notification-count">9+</small></i></span>
-                        <h3>Notificaciones</h3>
-                        <!--------------- BARRA DE NOTIS --------------->
-                        <div class="notifications-popup">
-                            <div>
-                                <div class="profile-photo">
-                                    <img src="../assets/profile_pics/profile-2.jpg" alt="">
-                                </div>
-                                <div class="notification-body">
-                                    <b>Algun random</b> aceptó tu solicitud de amistad
-                                    <small class="text-muted">Hace 2 día(s)</small>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="profile-photo">
-                                    <img src="../assets/profile_pics/profile-3.jpg">
-                                </div>
-                                <div class="notification-body">
-                                    <b>Otro random</b> comentó en tu post
-                                    <small class="text-muted">Hace 1 hora</small>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="profile-photo">
-                                    <img src="../assets/profile_pics/profile-4.jpg">
-                                </div>
-                                <div class="notification-body">
-                                    <b>Random 3</b> y <b>Otros 283</b> les gustó tu post
-                                    <small class="text-muted">Hace 4 minutos</small>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="profile-photo">
-                                    <img src="../assets/profile_pics/profile-5.jpeg">
-                                </div>
-                                <div class="notification-body">
-                                    <b>Random 4</b> comentó en un post donde se te etiquetó
-                                    <small class="text-muted">Hace 2 día(s)</small>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="profile-photo">
-                                    <img src="../assets/profile_pics/profile-6.png">
-                                </div>
-                                <div class="notification-body">
-                                    <b>Random 5</b> comentó en un post donde se te etiquetó
-                                    <small class="text-muted">Hace 1 hora</small>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="profile-photo">
-                                    <img src="../assets/profile_pics/profile-7.png">
-                                </div>
-                                <div class="notification-body">
-                                    <b>Random 6</b> comento en un post donde se te etiquetó
-                                    <small class="text-muted">Hace 1 hora</small>
-                                </div>
-                            </div>
-                        </div>
-                        <!--------------- SE TERMINA LA BARRA DE NOTIS --------------->
-                    </a>
                     <a class="menu-item" id="messages-notifications">
-                        <span><i class="uil uil-envelope-alt"><small class="notification-count">6</small></i></span>
+                        <span><i class="uil uil-envelope-alt"></i></span>
                         <h3>Mensajes</h3>
-                    </a>
-                    <a class="menu-item">
-                        <span><i class="uil uil-bookmark"></i></span>
-                        <h3>Guardados</h3>
                     </a>
                     <a class="menu-item" id="theme">
                         <span><i class="uil uil-palette"></i></span>
@@ -175,180 +106,130 @@ require_once 'back-end/verified-session.php'
                     </div>
                 </div>
                 <!----------------- FIN DE HISTORIAS -------------------->
-                <form action="" class="create-post">
+                <!-- <form action="" class="create-post">
                     <div class="profile-photo">
                         <img src="../assets/profile_pics/profile-1.png">
                     </div>
                     <input type="text" placeholder="Crea un post, usuario." id="create-post">
                     <input type="submit" value="Publicar" class="btn btn-primary">
-                </form>
+                </form> -->
                 <!----------------- FEEDS -------------------->
                 <div class="feeds">
-                    <!----------------- FEED 1 -------------------->
-                    <div class="feed" data-post-id="<?= htmlspecialchars($post['id']) ?>">
-                        <div class="head">
-                            <div class="user">
-                                <div class="profile-photo">
-                                    <img src="../assets/profile_pics/profile-2.jpg">
+                    <!----------------- FEED DINÁMICO ---------------->
+                    <?php
+                    require_once 'back-end/connection.php';
+                    require_once 'back-end/utils.php';
+                    $profile_to_view = null; // For general feed
+                    // For profile-page.php, this would be: $profile_to_view = $viewedUserId;
+                    
+                    $limit = 10; // Or however many posts per page
+                    $offset = 0; // Implement pagination later if needed
+                    $db = new DBConnection();
+                    $conn = $db->getConnection();
+                    $stmt_feed = $conn->prepare("CALL sp_GetFeedPosts(?, ?, ?, ?)");
+                    $stmt_feed->execute([$_SESSION['id_name'], $profile_to_view, $limit, $offset]);
+                    $feed_posts = $stmt_feed->fetchAll(PDO::FETCH_ASSOC);
+                    $stmt_feed->closeCursor();
+
+                    if (count($feed_posts) > 0) {
+                        foreach ($feed_posts as $post) {
+                            $post_id = htmlspecialchars($post['post_id']);
+                            $author_id_name = htmlspecialchars($post['author_id']);
+                            $author_username = htmlspecialchars($post['author_username']);
+                            $author_avatar_filename = $post['author_avatar'] ?? 'default-profile.png';
+                            $author_avatar_url = '../assets/profile_pics/' . htmlspecialchars($author_avatar_filename);
+                            $post_content = nl2br(htmlspecialchars($post['content'])); // nl2br to respect newlines
+                            $post_likes = (int) $post['likes'];
+                            $post_created_at = formatTimeAgo($post['created_at']);
+
+                            $media_html = '';
+                            if (!empty($post['media_path'])) {
+                                $media_url = '../assets/post_media/' . htmlspecialchars($post['media_path']);
+                                if ($post['media_type'] === 'image') {
+                                    $media_html = "<div class=\"photo\"><img src=\"{$media_url}\" alt=\"Post media\"></div>";
+                                } elseif ($post['media_type'] === 'video') {
+                                    $media_html = "<div class=\"photo\"><video controls src=\"{$media_url}\" style=\"width:100%; border-radius: var(--card-border-radius);\"></video></div>";
+                                }
+                            }
+                            // Verificar si el usuario actual ha dado "Me gusta" a este post
+                            $user_has_liked_post_stmt = $conn->prepare("SELECT func_HasUserLikedPost(:user_id, :post_id) AS has_liked");
+                            $user_has_liked_post_stmt->execute(['user_id' => $_SESSION['id_name'], 'post_id' => $post['post_id']]);
+                            $like_status = $user_has_liked_post_stmt->fetch(PDO::FETCH_ASSOC);
+                            $user_has_liked_this_post = (bool) ($like_status['has_liked'] ?? false);
+                            $user_has_liked_post_stmt->closeCursor();
+                            ?>
+                            <div class="feed" data-post-id="<?= $post_id ?>">
+                                <div class="head">
+                                    <div class="user">
+                                        <div class="profile-photo">
+                                            <img src="<?= $author_avatar_url ?>" alt="<?= $author_username ?>">
+                                        </div>
+                                        <div class="info">
+                                            <a href="profile-page.php?user=<?= $author_id_name ?>"
+                                                style="color: var(--color-dark); text-decoration: none;">
+                                                <h3><?= $author_username ?></h3>
+                                            </a>
+                                            <small><?= $post_created_at ?></small>
+                                        </div>
+                                    </div>
+                                    <span class="edit">
+                                        <i class="uil uil-ellipsis-h"></i>
+                                        <ul class="edit-menu"
+                                            style="display:none; position:absolute; background:var(--color-white); border-radius:var(--card-border-radius); box-shadow: 0 0 5px rgba(0,0,0,0.1); padding: 5px; right:0; top:100%; z-index:10;">
+                                            <?php if ($post['author_id'] === $_SESSION['id_name']): ?>
+                                            <?php else: ?>
+                                                <li style="padding: 5px 10px; cursor:pointer;" class="block-post-option"
+                                                    data-post-id="<?= $post_id ?>">Bloquear Publicación</li>
+                                            <?php endif; ?>
+                                        </ul>
+                                    </span>
                                 </div>
-                                <div class="info">
-                                    <a href="profile-page.php?user=BrandNew_gg">
-                                        <h3>Brandonsito</h3>
-                                    </a>
-                                    <small>Monterrey, Nuevo León. Hace 15 minuto(s)</small>
+                                <?php if (!empty($post_content)): ?>
+                                    <div class="description">
+                                        <p><?= $post_content ?></p>
+                                    </div>
+                                <?php endif; ?>
+                                <?= $media_html ?>
+
+                                <div class="action-buttons">
+                                    <div class="interaction-buttons">
+                                        <span class="like-btn" data-post-id="<?= $post_id ?>" title="Me gusta">
+                                            <i class="uil <?= $user_has_liked_this_post ? 'uil-heart' : 'uil-heart-alt' ?>"
+                                                style="color: <?= $user_has_liked_this_post ? 'var(--color-danger)' : 'inherit' ?>;"></i>
+                                        </span>
+                                        <span class="comment-btn" data-post-id="<?= $post_id ?>" title="Comentar">
+                                            <i class="uil uil-comment-dots"></i>
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                            <span class="edit">
-                                <i class="uil uil-ellipsis-h"></i>
-                                <ul class="edit-menu"
-                                    style="display:none; position:absolute; background:var(--color-white); border-radius:var(--card-border-radius); box-shadow: 0 0 5px rgba(0,0,0,0.1); padding: 5px; right:0; top:100%; z-index:10;">
-                                    <li style="padding: 5px 10px; cursor:pointer;" class="block-post-option"
-                                        data-post-id="<?= htmlspecialchars($post['id']) ?>">Bloquear Publicación</li>
-                                </ul>
-                            </span>
-                        </div>
-                        <div class="description">
-                            <p>Así la ciudad de Monterrey esta mañana</p>
-                        </div>
-                        <div class="photo">
-                            <img src="../assets/post_img/post-1.jpg">
-                        </div>
 
-                        <div class="action-buttons">
-                            <div class="interaction-buttons">
-                                <span><i class="uil uil-heart"></i></span>
-                                <span><i class="uil uil-comment-dots"></i></span>
-                                <span><i class="uil uil-share-alt"></i></span>
-                            </div>
-                            <div class="bookmark">
-                                <span><i class="uil uil-bookmark-full"></i></span>
-                            </div>
-                        </div>
-
-                        <div class="liked-by">
-                            <span><img src="../assets/profile_pics/profile-3.jpg"></span>
-                            <span><img src="../assets/profile_pics/profile-4.jpg"></span>
-                            <span><img src="../assets/profile_pics/profile-6.png"></span>
-                            <p>Le gusta a <b>Random</b> y <b>Otros 2,342</b></p>
-                        </div>
-
-                        <div class="caption">
-                            <p><b>Random</b> ta duro el asunto.
-                                <span class="harsh-tag">#MeDuelesMTY</span>
-                            </p>
-                        </div>
-
-                        <div class="comments text-muted">
-                            Ver todos los 100 comentarios
-                        </div>
-                    </div>
-                    <!----------------- FIN DE FEED 1 -------------------->
-
-                    <!----------------- FEED 2 -------------------->
-                    <div class="feed">
-                        <div class="head">
-                            <div class="user">
-                                <div class="profile-photo">
-                                    <img src="../assets/profile_pics/profile-4.jpg">
+                                <div class="liked-by" data-post-id="<?= $post_id ?>">
+                                    <p><b class="like-count"><?= $post_likes ?></b> persona(s) le gusta esto</p>
                                 </div>
-                                <div class="info">
-                                    <h3>Random</h3>
-                                    <small>Hace 2 horas</small>
-                                </div>
-                            </div>
-                            <span class="edit">
-                                <i class="uil uil-ellipsis-h"></i>
-                            </span>
-                        </div>
-                        <div class="description">
-                            <p></p>
-                        </div>
-                        <div class="photo">
-                            <img src="../assets/post_img/post-2.jpg">
-                        </div>
 
-                        <div class="action-buttons">
-                            <div class="interaction-buttons">
-                                <span><i class="uil uil-heart"></i></span>
-                                <span><i class="uil uil-comment-dots"></i></span>
-                                <span><i class="uil uil-share-alt"></i></span>
-                            </div>
-                            <div class="bookmark">
-                                <span><i class="uil uil-bookmark-full"></i></span>
-                            </div>
-                        </div>
-
-                        <div class="liked-by">
-                            <span><img src="../assets/profile_pics/profile-11.jpg"></span>
-                            <span><img src="../assets/profile_pics/profile-5.jpeg"></span>
-                            <span><img src="../assets/profile_pics/profile-12.jpg"></span>
-                            <p>Le gusta a <b>Random</b> y <b>Otros 1,323</b></p>
-                        </div>
-
-                        <div class="caption">
-                            <p><b>Random</b> Yo viendo que saqué 2 en el examen que dije que estaba de agua.
-                                <span class="harsh-tag"></span>
-                            </p>
-                        </div>
-
-                        <div class="comments text-muted">
-                            Ver todos los 50 comentarios
-                        </div>
-                    </div>
-                    <!----------------- FIN DE FEED 2 -------------------->
-
-                    <!----------------- FEED 3 -------------------->
-                    <div class="feed">
-                        <div class="head">
-                            <div class="user">
-                                <div class="profile-photo">
-                                    <img src="../assets/profile_pics/profile-7.png">
-                                </div>
-                                <div class="info">
-                                    <h3>Random</h3>
-                                    <small>Hace 50 minutos</small>
+                                <div class="comments-section" data-post-id="<?= $post_id ?>" style="margin-top:10px;">
+                                    <div class="existing-comments">
+                                    </div>
+                                    <button class="view-more-comments-btn btn text-muted" data-post-id="<?= $post_id ?>"
+                                        data-offset="0" style="display:none; margin-top:5px; font-size: 0.8rem;">Ver más
+                                        comentarios</button>
+                                    <form class="comment-form" data-post-id="<?= $post_id ?>"
+                                        style="margin-top: 10px; display: flex; gap: 5px;">
+                                        <input type="text" name="comment_content" class="comment-input"
+                                            placeholder="Escribe un comentario..."
+                                            style="flex-grow: 1; padding: 8px; border: 1px solid var(--color-grey); border-radius: 20px; font-size:0.85rem;">
+                                        <button type="submit" class="btn btn-primary"
+                                            style="padding: 8px 12px; font-size:0.85rem;">Enviar</button>
+                                    </form>
                                 </div>
                             </div>
-                            <span class="edit">
-                                <i class="uil uil-ellipsis-h"></i>
-                            </span>
-                        </div>
-                        <div class="description">
-                            <p>Achicopalado</p>
-                        </div>
-                        <div class="photo">
-                            <img src="../assets/post_img/post-3.jpg">
-                        </div>
+                            <?php
+                        } // End foreach
+                    } else {
+                        echo "<p class='text-muted' style='text-align:center; padding: 2rem;'>No hay publicaciones para mostrar.</p>";
+                    }
+                    ?>
 
-                        <div class="action-buttons">
-                            <div class="interaction-buttons">
-                                <span><i class="uil uil-heart"></i></span>
-                                <span><i class="uil uil-comment-dots"></i></span>
-                                <span><i class="uil uil-share-alt"></i></span>
-                            </div>
-                            <div class="bookmark">
-                                <span><i class="uil uil-bookmark-full"></i></span>
-                            </div>
-                        </div>
-
-                        <div class="liked-by">
-                            <span><img src="../assets/profile_pics/profile-12.jpg"></span>
-                            <span><img src="../assets/profile_pics/profile-9.jpg"></span>
-                            <span><img src="../assets/profile_pics/profile-2.jpg"></span>
-                            <p>Le gusta a <b>Random</b> y <b>Otros 5,179</b></p>
-                        </div>
-
-                        <div class="caption">
-                            <p><b>Random</b> yo ese
-                                <span class="harsh-tag"></span>
-                            </p>
-                        </div>
-
-                        <div class="comments text-muted">
-                            Ver todos los 408 comentarios
-                        </div>
-                    </div>
-                    <!----------------- FIN DE FEED 3 -------------------->
                 </div>
                 <!----------------- FIN DE FEEDS -------------------->
             </div>
@@ -357,6 +238,7 @@ require_once 'back-end/verified-session.php'
             <!----------------- DERECHA -------------------->
             <div class="right">
                 <!------- MENSAJES ------->
+
                 <div class="messages">
                     <div class="heading">
                         <h4>Mensajes</h4>
@@ -470,6 +352,7 @@ require_once 'back-end/verified-session.php'
             </div>
         </div>
     </div>
+
     <script>
         const currentLoggedInUserId = "<?php echo htmlspecialchars($_SESSION['id_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>";
         const loggedInUser = {
@@ -483,6 +366,7 @@ require_once 'back-end/verified-session.php'
     <script src="../js/messaging.js"></script>
     <script src="../js/friend_request.js"></script>
     <script src="../js/block_reports.js"></script>
+    <script src="../js/post_actions.js"></script>
 
 </body>
 

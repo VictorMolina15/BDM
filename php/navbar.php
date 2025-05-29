@@ -35,12 +35,13 @@
 <div class="modal create-modal">
     <div class="card">
         <ul>
-            <li><a class="menu-item" href="#">Crear publicación</a></li>
+            <li id="nav-create-post"><a class="menu-item" href="#">Crear publicación</a></li>
             <li><a class="menu-item" href="#">Crear Comunidad</a></li>
             <li><a class="menu-item" href="#">Subir historia</a></li>
         </ul>
     </div>
 </div>
+ <?php include 'modal-post.php';?>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         /* ================== PROFILE MODAL ================== */
