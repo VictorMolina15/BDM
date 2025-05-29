@@ -238,21 +238,6 @@ DELIMITER ;
 -- --------------- Stored Procedures para Búsqueda Global ---------------
 
 DELIMITER $$
--- Stored Procedure para buscar usuarios globalmente (para la barra de navegación)
-CREATE PROCEDURE sp_SearchGlobalUsers (
-    IN p_search_query VARCHAR(255)
-)
-BEGIN
-    DECLARE search_param VARCHAR(260);
-    SET search_param = CONCAT('%', p_search_query, '%');
-
-    SELECT id_name, username, profile_picture
-    FROM users
-    WHERE id_name LIKE search_param OR username LIKE search_param;
-END$$
-DELIMITER ;
-
-DELIMITER $$
 -- Stored Procedure para buscar comunidades globalmente (para la barra de navegación)
 CREATE PROCEDURE sp_SearchGlobalCommunities (
     IN p_search_query VARCHAR(255)
@@ -434,5 +419,183 @@ BEGIN
     SELECT friend_id
     FROM friends
     WHERE user_id = p_user_id AND stat = 'accepted';
+END$$
+DELIMITER ;
+-- --------------- Stored Procedures para Bloqueos/Reportes ---------------
+
+DELIMITER $$
+-- Bloquear/Reportar un Usuario
+CREATE PROCEDURE sp_BlockOrReportUser(
+    IN p_reporting_user_id VARCHAR(15),
+    IN p_reported_user_id VARCHAR(15),
+    IN p_reason TEXT
+)
+BEGIN
+    IF p_reporting_user_id = p_reported_user_id THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No puedes bloquearte o reportarte a ti mismo.';
+    ELSE
+        -- Verificar si ya existe un bloqueo activo para este par
+        IF NOT EXISTS (SELECT 1 FROM reports WHERE reporting_user_id = p_reporting_user_id AND reported_user_id = p_reported_user_id AND reporting_post_id IS NULL) THEN
+            INSERT INTO reports (reporting_user_id, reported_user_id, reason, reporting_post_id)
+            VALUES (p_reporting_user_id, p_reported_user_id, p_reason, NULL);
+            SELECT 'user_blocked' AS result_status, 'Usuario bloqueado/reportado exitosamente.' AS message;
+        ELSE
+            -- Si ya existe, se podría actualizar la razón o simplemente informar
+            UPDATE reports
+            SET reason = p_reason, created_at = CURRENT_TIMESTAMP
+            WHERE reporting_user_id = p_reporting_user_id AND reported_user_id = p_reported_user_id AND reporting_post_id IS NULL;
+            SELECT 'block_updated' AS result_status, 'Bloqueo/reporte de usuario actualizado.' AS message;
+        END IF;
+    END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+-- Bloquear/Reportar una Publicación
+CREATE PROCEDURE sp_BlockOrReportPost(
+    IN p_reporting_user_id VARCHAR(15),
+    IN p_reporting_post_id INT,
+    IN p_reason TEXT
+)
+BEGIN
+    DECLARE v_post_author_id VARCHAR(15);
+
+    -- (Opcional) Obtener el autor del post para registrarlo si es necesario
+    -- SELECT user_id INTO v_post_author_id FROM posts WHERE id = p_reporting_post_id;
+    -- Por ahora, el reported_user_id será NULL si es un reporte de post específico
+
+    IF NOT EXISTS (SELECT 1 FROM reports WHERE reporting_user_id = p_reporting_user_id AND reporting_post_id = p_reporting_post_id) THEN
+        INSERT INTO reports (reporting_user_id, reporting_post_id, reason, reported_user_id)
+        VALUES (p_reporting_user_id, p_reporting_post_id, p_reason, NULL); -- O v_post_author_id si se obtiene
+        SELECT 'post_blocked' AS result_status, 'Publicación bloqueada/reportada exitosamente.' AS message;
+    ELSE
+        UPDATE reports
+        SET reason = p_reason, created_at = CURRENT_TIMESTAMP
+        WHERE reporting_user_id = p_reporting_user_id AND reporting_post_id = p_reporting_post_id;
+        SELECT 'block_updated' AS result_status, 'Bloqueo/reporte de publicación actualizado.' AS message;
+    END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+-- Desbloquear un Usuario
+CREATE PROCEDURE sp_UnblockUser(
+    IN p_reporting_user_id VARCHAR(15),
+    IN p_reported_user_id VARCHAR(15)
+)
+BEGIN
+    DELETE FROM reports
+    WHERE reporting_user_id = p_reporting_user_id AND reported_user_id = p_reported_user_id AND reporting_post_id IS NULL;
+    IF ROW_COUNT() > 0 THEN
+        SELECT 'user_unblocked' AS result_status, 'Usuario desbloqueado.' AS message;
+    ELSE
+        SELECT 'block_not_found' AS result_status, 'No se encontró un bloqueo activo para este usuario.' AS message;
+    END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+-- Desbloquear una Publicación
+CREATE PROCEDURE sp_UnblockPost(
+    IN p_reporting_user_id VARCHAR(15),
+    IN p_reporting_post_id INT
+)
+BEGIN
+    DELETE FROM reports
+    WHERE reporting_user_id = p_reporting_user_id AND reporting_post_id = p_reporting_post_id;
+    IF ROW_COUNT() > 0 THEN
+        SELECT 'post_unblocked' AS result_status, 'Publicación desbloqueada.' AS message;
+    ELSE
+        SELECT 'block_not_found' AS result_status, 'No se encontró un bloqueo activo para esta publicación.' AS message;
+    END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+-- Obtener la lista de bloqueos/reportes de un usuario
+CREATE PROCEDURE sp_GetUserBlocksAndReports(
+    IN p_current_user_id VARCHAR(15)
+)
+BEGIN
+    SELECT
+        r.id AS report_id,
+        r.reason,
+        r.created_at,
+        r.reported_user_id,
+        u.username AS reported_username,
+        u.profile_picture AS reported_user_avatar,
+        r.reporting_post_id,
+        SUBSTRING(p.content, 1, 100) AS post_content_preview, -- Muestra un preview del contenido del post
+        p_author.id_name AS post_author_id,
+        p_author.username AS post_author_username
+    FROM reports r
+    LEFT JOIN users u ON r.reported_user_id = u.id_name
+    LEFT JOIN posts p ON r.reporting_post_id = p.id
+    LEFT JOIN users p_author ON p.user_id = p_author.id_name -- Para obtener el autor del post
+    WHERE r.reporting_user_id = p_current_user_id
+    ORDER BY r.created_at DESC;
+END$$
+DELIMITER ;
+
+-- Para el Feed (sp_GetFeedPosts del paso anterior, ahora con filtros de bloqueo)
+DELIMITER $$
+CREATE PROCEDURE sp_GetFeedPosts(
+    IN p_current_user_id VARCHAR(15),
+    IN p_limit INT,
+    IN p_offset INT
+)
+BEGIN
+    SELECT p.*, u.username, u.profile_picture
+    FROM posts p
+    JOIN users u ON p.user_id = u.id_name
+    WHERE
+        (
+            p.user_id = p_current_user_id OR -- Publicaciones propias
+            p.user_id IN (SELECT friend_id FROM friends WHERE user_id = p_current_user_id AND stat = 'accepted') -- Publicaciones de amigos
+            -- Aquí podrías añadir lógica para posts de comunidades a las que pertenece, etc.
+        )
+        AND p.user_id NOT IN ( -- Excluir posts de usuarios bloqueados por el usuario actual
+            SELECT rep.reported_user_id
+            FROM reports rep
+            WHERE rep.reporting_user_id = p_current_user_id AND rep.reported_user_id IS NOT NULL
+        )
+        AND p.id NOT IN ( -- Excluir posts específicos bloqueados por el usuario actual
+            SELECT rep.reporting_post_id
+            FROM reports rep
+            WHERE rep.reporting_user_id = p_current_user_id AND rep.reporting_post_id IS NOT NULL
+        )
+        AND p.user_id NOT IN ( -- Excluir posts de usuarios que han bloqueado al usuario actual
+             SELECT rep.reporting_user_id
+             FROM reports rep
+             WHERE rep.reported_user_id = p_current_user_id AND rep.reporting_user_id IS NOT NULL
+        )
+    ORDER BY p.created_at DESC
+    LIMIT p_limit OFFSET p_offset;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sp_SearchGlobalUsers (
+    IN p_search_query VARCHAR(255),
+    IN p_viewer_id VARCHAR(15) -- Usuario que realiza la búsqueda
+)
+BEGIN
+    DECLARE search_param VARCHAR(260);
+    SET search_param = CONCAT('%', p_search_query, '%');
+
+    SELECT u.id_name, u.username, u.profile_picture
+    FROM users u
+    WHERE (u.id_name LIKE search_param OR u.username LIKE search_param)
+      AND u.id_name != p_viewer_id -- No mostrarse a sí mismo
+      AND u.id_name NOT IN ( -- Excluir usuarios bloqueados por el viewer
+          SELECT rep.reported_user_id
+          FROM reports rep
+          WHERE rep.reporting_user_id = p_viewer_id AND rep.reported_user_id IS NOT NULL
+      )
+      AND u.id_name NOT IN ( -- Excluir usuarios que han bloqueado al viewer
+          SELECT rep.reporting_user_id
+          FROM reports rep
+          WHERE rep.reported_user_id = p_viewer_id AND rep.reporting_user_id IS NOT NULL
+      );
 END$$
 DELIMITER ;

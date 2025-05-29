@@ -269,4 +269,61 @@ Bg3.addEventListener('click', () => {
     Bg2.classList.remove('active');
     changeBG();
     saveSettings();
+
+    // Bloqueos y Reportes
+    document.querySelectorAll('.feed .head .edit > i').forEach(icon => {
+        icon.addEventListener('click', function (event) {
+            const menu = this.nextElementSibling;
+            if (menu && menu.classList.contains('edit-menu')) {
+                menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            }
+            event.stopPropagation(); // Para que el click en el documento no lo cierre inmediatamente
+        });
+    });
+
+    document.querySelectorAll('.block-post-option').forEach(option => {
+        option.addEventListener('click', function () {
+            const postId = this.dataset.postId;
+            const reason = prompt("Motivo del bloqueo/reporte de la publicación (opcional):");
+            if (reason === null) return; // Usuario canceló
+
+            const formData = new FormData();
+            formData.append('action', 'block_post');
+            formData.append('reported_post_id', postId);
+            if (reason) {
+                formData.append('reason', reason);
+            }
+
+            fetch('back-end/block_report_ajax.php', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(result => {
+                    alert(result.message);
+                    if (result.status === 'success') {
+                        // Ocultar el post de la vista actual o marcarlo como bloqueado
+                        const feedElement = this.closest('.feed');
+                        if (feedElement) {
+                            // feedElement.style.display = 'none'; // Opción simple
+                            feedElement.innerHTML = '<p class="text-muted" style="padding:1rem; text-align:center;">Esta publicación ha sido bloqueada y no se mostrará.</p>';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al bloquear post:', error);
+                    alert('Error de red al bloquear la publicación.');
+                });
+            this.closest('.edit-menu').style.display = 'none'; // Ocultar menú
+        });
+    });
+
+    // Cerrar menús de edición si se hace clic fuera
+    document.addEventListener('click', function (event) {
+        document.querySelectorAll('.edit-menu').forEach(menu => {
+            if (!menu.parentElement.contains(event.target)) {
+                menu.style.display = 'none';
+            }
+        });
+    });
 });

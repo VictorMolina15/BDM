@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once 'back-end/verified-session.php'
-?>
+    ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -185,7 +185,7 @@ require_once 'back-end/verified-session.php'
                 <!----------------- FEEDS -------------------->
                 <div class="feeds">
                     <!----------------- FEED 1 -------------------->
-                    <div class="feed">
+                    <div class="feed" data-post-id="<?= htmlspecialchars($post['id']) ?>">
                         <div class="head">
                             <div class="user">
                                 <div class="profile-photo">
@@ -200,6 +200,11 @@ require_once 'back-end/verified-session.php'
                             </div>
                             <span class="edit">
                                 <i class="uil uil-ellipsis-h"></i>
+                                <ul class="edit-menu"
+                                    style="display:none; position:absolute; background:var(--color-white); border-radius:var(--card-border-radius); box-shadow: 0 0 5px rgba(0,0,0,0.1); padding: 5px; right:0; top:100%; z-index:10;">
+                                    <li style="padding: 5px 10px; cursor:pointer;" class="block-post-option"
+                                        data-post-id="<?= htmlspecialchars($post['id']) ?>">Bloquear Publicación</li>
+                                </ul>
                             </span>
                         </div>
                         <div class="description">
@@ -360,13 +365,10 @@ require_once 'back-end/verified-session.php'
                     <!------- BARRA BUSQUEDA ------->
                     <div class="search-bar">
                         <i class="uil uil-search"></i>
-                        <input type="search" placeholder="Buscar mensajes" id="message-search">
+                        <input type="search" placeholder="Buscar usuarios" id="message-search">
                     </div>
                     <!------- MENSAJES CATEGORIA ------->
                     <div class="category">
-                        <h6 class="active">Principal</h6>
-                        <h6>General</h6>
-                        <h6 class="message-requests">solicitudes (7)</h6>
                     </div>
                 </div>
                 <!------- FIN DE MENSAJES ------->
@@ -442,10 +444,7 @@ require_once 'back-end/verified-session.php'
         <div class="card">
             <h2>Ajustes</h2><br>
             <ul>
-                <li>
-                    <p>Configuración de Notificaciones</p>
-                </li>
-                <li>
+                <li id="manage-blocks-link">
                     <p>Administrar Bloqueos/Reportes</p>
                 </li>
                 <li>
@@ -456,7 +455,21 @@ require_once 'back-end/verified-session.php'
                 </li>
             </ul>
         </div>
-    </div> 
+    </div>
+    <!----------------- MODAL DE BLOQUEOS/REPORTES --------------->
+    <div class="modal" id="blocks-reports-modal" style="z-index: 1005; position: fixed;">
+        <div class="card" style="width: 60%; max-width: 700px; padding: 20px; top: auto; right: auto;">
+            <div class="modal-header"
+                style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--color-light); margin-bottom:15px;">
+                <h2>Mis Bloqueos / Reportes</h2>
+                <span class="close-modal-btn" data-modal-id="blocks-reports-modal"
+                    style="font-size: 1.8rem; cursor: pointer; font-weight:bold;">&times;</span>
+            </div>
+            <div id="blocks-reports-list-container" style="max-height: 400px; overflow-y: auto; padding-right:10px;">
+                <p class="text-muted">Cargando...</p>
+            </div>
+        </div>
+    </div>
     <script>
         const currentLoggedInUserId = "<?php echo htmlspecialchars($_SESSION['id_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>";
         const loggedInUser = {
@@ -469,6 +482,7 @@ require_once 'back-end/verified-session.php'
     <script src="../js/homepage.js"></script>
     <script src="../js/messaging.js"></script>
     <script src="../js/friend_request.js"></script>
+    <script src="../js/block_reports.js"></script>
 
 </body>
 

@@ -218,7 +218,10 @@ if (isset($_SESSION['edit_feedback_msg'])) {
                                         data-other-user-avatar="<?= htmlspecialchars($userData['profile_picture'] ?? '') ?>">
                                         Mensaje
                                     </button>
-                                    <button class="btn-secondary">Bloquear</button>
+                                    <button id="block-user-profile-btn" class="btn btn-danger"
+                                        data-profile-id="<?= htmlspecialchars($userData['id_name']) ?>">
+                                        Bloquear Usuario
+                                    </button>
                                 <?php endif; ?>
                             </div>
 
@@ -401,7 +404,7 @@ if (isset($_SESSION['edit_feedback_msg'])) {
 
     const friendshipBtn = document.getElementById('friendship-action-btn');
     const loggedInUserId = "<?php echo htmlspecialchars($_SESSION['id_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>";
-    
+
     function updateFriendshipButton(status, profileId) {
         if (!friendshipBtn) return;
         friendshipBtn.disabled = false;
@@ -430,8 +433,8 @@ if (isset($_SESSION['edit_feedback_msg'])) {
                 // friendshipBtn.textContent = 'Aceptar Solicitud';
                 // friendshipBtn.onclick = () => handleFriendAction('accept_friend_request', profileId);
                 // O simplemente indicar que tiene una solicitud pendiente de este usuario
-                 friendshipBtn.textContent = 'Solicitud Recibida';
-                 friendshipBtn.disabled = true; // No se acciona desde aquí directamente.
+                friendshipBtn.textContent = 'Solicitud Recibida';
+                friendshipBtn.disabled = true; // No se acciona desde aquí directamente.
                 break;
             case 'not_friends':
             default:
@@ -443,7 +446,7 @@ if (isset($_SESSION['edit_feedback_msg'])) {
     }
 
     async function handleFriendAction(action, targetUserId) {
-        if(friendshipBtn) friendshipBtn.disabled = true;
+        if (friendshipBtn) friendshipBtn.disabled = true;
 
         const formData = new FormData();
         formData.append('action', action);
@@ -462,30 +465,30 @@ if (isset($_SESSION['edit_feedback_msg'])) {
 
             if (result.status === 'success') {
                 // Actualizar el botón basado en el nuevo estado si está disponible
-                if(result.new_friendship_status) {
+                if (result.new_friendship_status) {
                     updateFriendshipButton(result.new_friendship_status, targetUserId);
                 } else if (action === 'send_friend_request') {
-                     updateFriendshipButton('request_sent', targetUserId); // Asumir que se envió
+                    updateFriendshipButton('request_sent', targetUserId); // Asumir que se envió
                 }
                 // Podrías mostrar un mensaje de éxito pequeño si lo deseas
                 // alert(result.message); 
             } else {
                 alert('Error: ' + result.message);
-                if(friendshipBtn) friendshipBtn.disabled = false; // Re-habilitar si falló
+                if (friendshipBtn) friendshipBtn.disabled = false; // Re-habilitar si falló
             }
         } catch (error) {
             console.error('Error en la acción de amistad:', error);
             alert('Ocurrió un error al procesar la solicitud.');
-            if(friendshipBtn) friendshipBtn.disabled = false;
+            if (friendshipBtn) friendshipBtn.disabled = false;
         }
     }
 
     function fetchFriendshipStatus() {
         if (!friendshipBtn || loggedInUserId === friendshipBtn.dataset.profileId) {
-             if(friendshipBtn && loggedInUserId === friendship_btn.dataset.profileId) friendshipBtn.style.display = 'none'; // No mostrar botón en propio perfil
+            if (friendshipBtn && loggedInUserId === friendship_btn.dataset.profileId) friendshipBtn.style.display = 'none'; // No mostrar botón en propio perfil
             return;
         }
-        
+
         const profileId = friendshipBtn.dataset.profileId;
         if (!profileId) return;
 
@@ -500,23 +503,60 @@ if (isset($_SESSION['edit_feedback_msg'])) {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success' && data.data && data.data.friendship_status) {
-                updateFriendshipButton(data.data.friendship_status, profileId);
-            } else {
-                updateFriendshipButton('not_friends', profileId); // Fallback
-                console.error("Error fetching status or status not found: ", data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error al obtener estado de amistad:', error);
-            updateFriendshipButton('not_friends', profileId); // Fallback en caso de error de red
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success' && data.data && data.data.friendship_status) {
+                    updateFriendshipButton(data.data.friendship_status, profileId);
+                } else {
+                    updateFriendshipButton('not_friends', profileId); // Fallback
+                    console.error("Error fetching status or status not found: ", data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener estado de amistad:', error);
+                updateFriendshipButton('not_friends', profileId); // Fallback en caso de error de red
+            });
     }
 
     if (!<?php echo json_encode($isOwnProfile); ?>) { // Solo ejecutar si no es el perfil propio
         fetchFriendshipStatus();
+    }
+    const blockUserProfileBtn = document.getElementById('block-user-profile-btn');
+
+    if (blockUserProfileBtn) {
+        blockUserProfileBtn.addEventListener('click', function() {
+            const profileId = this.dataset.profileId;
+            const reason = prompt("Motivo del bloqueo/reporte (opcional):");
+            // No enviar si el usuario cancela el prompt
+            if (reason === null) {
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('action', 'block_user');
+            formData.append('reported_user_id', profileId);
+            if (reason) { // Solo añadir si no es vacío
+                formData.append('reason', reason);
+            }
+
+            fetch('back-end/block_report_ajax.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                alert(result.message);
+                if (result.status === 'success') {
+                    // Podrías cambiar el texto del botón o deshabilitarlo
+                    this.textContent = 'Usuario Bloqueado';
+                    this.disabled = true;
+                }
+            })
+            .catch(error => {
+                console.error('Error al bloquear usuario:', error);
+                alert('Error de red al bloquear usuario.');
+            });
+        });
     }
 </script>
 <script src="../js/messaging.js"></script>

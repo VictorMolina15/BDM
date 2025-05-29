@@ -7,7 +7,7 @@
         </a>
         <div class="search-bar" style="position:relative;"> <!--Ensure this div has position: relative; in your CSS if not already  -->
             <i class="uil uil-search"></i>
-            <input type="search" id="global-search-input" placeholder="Busca personas, comunidades, posts, etc."> 
+            <input type="search" id="global-search-input" placeholder="Busca personas y comunidades"> 
             <div id="global-search-results-container" class="global-search-results"></div> 
         </div>
         <div class="create">

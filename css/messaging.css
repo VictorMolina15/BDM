@@ -16,8 +16,7 @@
 }
 
 .chat-header {
-    background: var(--color-primary);
-    color: var(--color-white);
+    background-color: var(--color-primary);
     padding: 8px 12px; /* Adjusted padding */
     display: flex;
     align-items: center;

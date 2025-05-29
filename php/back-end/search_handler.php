@@ -10,21 +10,29 @@ if (isset($_POST['action']) && $_POST['action'] === 'global_search' && isset($_P
     $db = new DBConnection();
     $conn = $db->getConnection();
     $search_term_raw = trim($_POST['search_term']); // Término de búsqueda sin procesar
+    $current_user_id = $_SESSION['id_name'];
 
-    if (empty($search_term_raw)) {
+    if (empty($search_term_raw)) { 
         $response['message'] = 'El término de búsqueda no puede estar vacío.';
         header('Content-Type: application/json');
         echo json_encode($response);
         exit();
     }
 
+    if (!$current_user_id) { // El viewer_id es necesario
+        $response['message'] = 'Error de autenticación para realizar la búsqueda.';
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        exit();
+    }
     try {
         // Buscar Usuarios usando Stored Procedure
-        $stmt_users = $conn->prepare("CALL sp_SearchGlobalUsers(:search_query)");
-        $stmt_users->bindParam(':search_query', $search_term_raw, PDO::PARAM_STR);
+        $stmt_users = $conn->prepare("CALL sp_SearchGlobalUsers(:search_query, :viewer_id)");
+        $stmt_users->bindParam(':search_query', $search_term_raw);
+        $stmt_users->bindParam(':viewer_id', $current_user_id); // Pasar el ID del viewer
         $stmt_users->execute();
         $users = $stmt_users->fetchAll(PDO::FETCH_ASSOC);
-        $stmt_users->closeCursor(); // Buena práctica cerrar el cursor
+        $stmt_users->closeCursor();
 
         // Buscar Comunidades usando Stored Procedure
         $stmt_communities = $conn->prepare("CALL sp_SearchGlobalCommunities(:search_query)");

@@ -495,6 +495,7 @@ main .container .right {
     display: flex;
     justify-content: space-between;
     margin-bottom: 1rem;
+    border-bottom: 2px solid var(--color-light);
 }
 
 .right .messages .category h6 {
@@ -816,7 +817,24 @@ pa tablets y laps
         width: 80vw;
     }
 }
-
+/* ========== Contenido Bloqueado ===============*/
+.blocked-item {
+    /* Tus estilos aquí, por ejemplo: */
+    background-color: var(--color-light);
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: var(--card-border-radius);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.blocked-item div strong {
+    color: var(--color-dark);
+}
+.blocked-item .btn-unblock {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+}
 /* ================= 
 para movil
 ==================== */

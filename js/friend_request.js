@@ -28,8 +28,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         <img src="${avatarUrl}" alt="${encodeURIComponent(req.requester_username)}">
                     </div>
                     <div>
-                        <h5>${req.requester_username}</h5>
-                        <p class="text-muted">@${req.requester_id}</p>
+                        <a href="profile-page.php?user=${req.requester_id}" style="color: var(--color-dark)"><h5>${req.requester_username}</h5>
+                        <p class="text-muted">@${req.requester_id}</p><a>
                     </div>
                 </div>
                 <div class="action">
