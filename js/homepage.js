@@ -261,7 +261,7 @@ Bg3.addEventListener('click', () => {
     changeBG();
     saveSettings();
 
-    // Bloqueos y Reportes
+// ============== Bloqueos y Reportes
     document.querySelectorAll('.feed .head .edit > i').forEach(icon => {
         icon.addEventListener('click', function (event) {
             const menu = this.nextElementSibling;

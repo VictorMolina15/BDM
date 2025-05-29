@@ -68,7 +68,7 @@ require_once 'back-end/verified-session.php'
             <div class="middle">
                 <!----------------- HISTORIAS -------------------->
                 <!-- <div class="stories">
-                    
+
                     <div class="story">
                         <div class="profile-photo">
                             <img src="../assets/profile_pics/profile-1.png">
@@ -330,7 +330,7 @@ require_once 'back-end/verified-session.php'
                 <li id="manage-blocks-link">
                     <p>Administrar Bloqueos/Reportes</p>
                 </li>
-                <li>
+                <li id="view-activity-report-link">
                     <p>Ver actividad Reciente</p>
                 </li>
                 <li onclick="location='back-end/session-end.php'">
@@ -362,6 +362,20 @@ require_once 'back-end/verified-session.php'
             // Ensure 'avatar' is the correct session variable key for the profile picture filename
             avatar: "<?php echo htmlspecialchars($_SESSION['avatar'] ?? 'default-profile.png', ENT_QUOTES, 'UTF-8'); ?>"
         };
+        const viewActivityReportLink = document.getElementById('view-activity-report-link');
+        if (viewActivityReportLink) {
+            viewActivityReportLink.addEventListener('click', (event) => {
+                event.preventDefault(); // Prevenir comportamiento por defecto si fuera un <a>
+
+                const settingsModal = document.querySelector('.settings-modal');
+                if (settingsModal) {
+                    settingsModal.style.display = 'none'; // Ocultar el modal de ajustes
+                }
+
+                // Abrir el script PHP que generará y servirá el PDF en una nueva pestaña
+                window.open('back-end/generate_activity_report.php', '_blank');
+            });
+        }
     </script>
     <script src="../js/homepage.js"></script>
     <script src="../js/messaging.js"></script>
