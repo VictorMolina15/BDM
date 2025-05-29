@@ -67,7 +67,8 @@ require_once 'back-end/verified-session.php'
             <!-----------------TOP PAGE -------------------->
             <div class="middle">
                 <!----------------- HISTORIAS -------------------->
-                <div class="stories">
+                <!-- <div class="stories">
+                    
                     <div class="story">
                         <div class="profile-photo">
                             <img src="../assets/profile_pics/profile-1.png">
@@ -104,7 +105,7 @@ require_once 'back-end/verified-session.php'
                         </div>
                         <p class="name">Random</p>
                     </div>
-                </div>
+                </div> -->
                 <!----------------- FIN DE HISTORIAS -------------------->
                 <!-- <form action="" class="create-post">
                     <div class="profile-photo">

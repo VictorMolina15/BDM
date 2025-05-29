@@ -799,3 +799,109 @@ END$$
 
 DELIMITER ;
 
+DELIMITER $$
+
+-- Crear Comunidad
+CREATE PROCEDURE sp_CreateCommunity (
+    IN p_creator_id VARCHAR(15),
+    IN p_name VARCHAR(100),
+    IN p_descrip TEXT,
+    IN p_community_pic VARCHAR(255),
+    IN p_cover_pic VARCHAR(255),
+    OUT p_community_id INT
+)
+BEGIN
+    DECLARE v_existing_community INT DEFAULT 0;
+
+    -- Validar que el nombre de la comunidad no esté vacío
+    IF p_name IS NULL OR TRIM(p_name) = '' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El nombre de la comunidad no puede estar vacío.';
+    END IF;
+
+    -- Validar unicidad del nombre de la comunidad
+    SELECT COUNT(*) INTO v_existing_community FROM communities WHERE name_comm = p_name;
+    IF v_existing_community > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Ya existe una comunidad con este nombre.';
+    END IF;
+
+    INSERT INTO communities (name_comm, descrip, community_picture, cover_picture, creator_id, created_at)
+    VALUES ( TRIM(p_name), TRIM(p_descrip), p_community_pic, p_cover_pic, p_creator_id, NOW());
+
+    SET p_community_id = LAST_INSERT_ID();
+
+    IF p_community_id > 0 THEN
+        -- Agregar al creador como administrador
+        INSERT INTO community_members (community_id, user_id, role_type, joined_at)
+        VALUES (p_community_id, p_creator_id, 'admin', NOW());
+        
+        SELECT 'success' AS `status`, 'Comunidad creada exitosamente.' AS message, p_community_id AS community_id;
+    ELSE
+        SELECT 'error' AS `status`, 'No se pudo crear la comunidad.' AS message, NULL AS community_id;
+    END IF;
+END$$
+
+-- Modificar sp_CreatePost para incluir community_id
+DROP PROCEDURE IF EXISTS sp_CreatePost$$
+CREATE PROCEDURE sp_CreatePost(
+    IN p_user_id VARCHAR(15),
+    IN p_content TEXT,
+    IN p_media_path VARCHAR(255),
+    IN p_media_type ENUM('image', 'video', 'none'),
+    IN p_community_id INT -- Nuevo parámetro
+)
+BEGIN
+    DECLARE v_post_id INT;
+
+    -- Validación: si se provee p_community_id, verificar que el usuario es miembro
+    IF p_community_id IS NOT NULL THEN
+        IF NOT EXISTS (SELECT 1 FROM community_members WHERE community_id = p_community_id AND user_id = p_user_id) THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No eres miembro de la comunidad especificada para publicar en ella.';
+        END IF;
+    END IF;
+
+    INSERT INTO posts (user_id, content, likes, created_at, community_id) -- Añadido community_id
+    VALUES (p_user_id, p_content, 0, NOW(), p_community_id); -- Añadido p_community_id
+
+    SET v_post_id = LAST_INSERT_ID();
+
+    IF p_media_path IS NOT NULL AND p_media_type != 'none' THEN
+        INSERT INTO multimedia (post_id, media, media_type)
+        VALUES (v_post_id, p_media_path, p_media_type);
+    END IF;
+
+    SELECT
+        p.id AS post_id,
+        p.user_id,
+        u.username AS author_username,
+        u.profile_picture AS author_avatar,
+        p.content,
+        p.likes,
+        p.created_at,
+        m.media AS media_path,
+        m.media_type,
+        p.community_id -- Devolver community_id
+    FROM posts p
+    JOIN users u ON p.user_id = u.id_name
+    LEFT JOIN multimedia m ON p.id = m.post_id
+    WHERE p.id = v_post_id;
+END$$
+
+-- Asegúrate que la VISTA view_post_feed_details incluya community_id
+DROP VIEW IF EXISTS view_post_feed_details$$
+CREATE VIEW view_post_feed_details AS
+SELECT
+    p.id AS post_id,
+    p.user_id AS author_id,
+    u.username AS author_username,
+    u.profile_picture AS author_avatar,
+    p.content,
+    p.likes,
+    p.created_at,
+    m.media AS media_path,
+    m.media_type,
+    p.community_id -- Asegúrate que esta línea esté presente
+FROM posts p
+JOIN users u ON p.user_id = u.id_name
+LEFT JOIN multimedia m ON p.id = m.post_id$$
+
+DELIMITER ;

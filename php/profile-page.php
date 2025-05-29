@@ -206,7 +206,7 @@ if (isset($_SESSION['edit_feedback_msg'])) {
                             </div>
                             <div class="actions">
                                 <?php if ($isOwnProfile): ?>
-                                    <button class="btn-secondary">Subir historia</button>
+                                    <!-- <button class="btn-secondary">Subir historia</button> -->
                                     <button id="edit-profile" class="btn-secondary">Editar Perfil</button>
                                 <?php else: ?>
                                     <button id="friendship-action-btn" class="btn-primary"
@@ -236,12 +236,11 @@ if (isset($_SESSION['edit_feedback_msg'])) {
                 <div class="sidebar">
                     <div class="profile-info">
                         <h2>Detalles</h2>
-                        <p> <?= htmlspecialchars($userData['biography']) ?></p>
-                        <p>Vive en <?= htmlspecialchars($userData['location']) ?></p>
-                        <p>Estudió en <?= htmlspecialchars($userData['education']) ?></p>
-                        <p>Nacío el 30 de Febrero de 2026</p>
+                        <p> <?= htmlspecialchars($userData['biography'] ?? '') ?></p>
+                        <p>Vive en <?= htmlspecialchars($userData['location']?? '---') ?></p>
+                        <p>Estudió en <?= htmlspecialchars($userData['education'] ?? '---') ?></p>
                     </div>
-                    <div class="profile-friends">
+                    <!-- <div class="profile-friends">
                         <h3>Amigos</h3>
                         <div class="friend">
                             <div class="profile-photo">
@@ -263,7 +262,7 @@ if (isset($_SESSION['edit_feedback_msg'])) {
                                 <img src="../assets/profile_pics/profile-8.png" alt="">
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div class="right-cont">

@@ -27,7 +27,7 @@
             <li><a class="menu-item" href="profile-page.php?user=<?= htmlspecialchars($_SESSION['id_name'] ?? '') ?>">
                     <p>Ver Perfil</p>
                 </a></li>
-            <li><a class="menu-item" href="#">Configuración de Cuenta</a></li>
+            <!-- <li><a class="menu-item" href="#">Configuración de Cuenta</a></li> -->
             <li><a class="menu-item" href="back-end/session-end.php">Cerrar Sesión</a></li>
         </ul>
     </div>
@@ -36,12 +36,13 @@
     <div class="card">
         <ul>
             <li id="nav-create-post"><a class="menu-item" href="#">Crear publicación</a></li>
-            <li><a class="menu-item" href="#">Crear Comunidad</a></li>
-            <li><a class="menu-item" href="#">Subir historia</a></li>
+            <li id="nav-create-community"><a class="menu-item" href="#">Crear Comunidad</a></li>
+            <!-- <li><a class="menu-item" href="#">Subir historia</a></li> -->
         </ul>
     </div>
 </div>
  <?php include 'modal-post.php';?>
+ <?php include 'modal-community-create.php'; ?>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         /* ================== PROFILE MODAL ================== */

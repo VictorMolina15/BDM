@@ -98,19 +98,22 @@ CREATE TABLE communities (
     descrip TEXT,
     community_picture VARCHAR(255) NULL,
     cover_picture VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    creator_id VARCHAR(15) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY (creator_id) REFERENCES users(id_name) ON DELETE SET NULL
 );
-
 
 -- Tabla de Miembros de Comunidad
 CREATE TABLE community_members (
     community_id INT,
     user_id VARCHAR(15),
     role_type ENUM('member', 'admin') DEFAULT 'member',
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (community_id, user_id),
     FOREIGN KEY (community_id) REFERENCES communities(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id_name) ON DELETE CASCADE
 );
+
 
 -- Tabla de Mensajes Privados (Chat)
 CREATE TABLE chat (

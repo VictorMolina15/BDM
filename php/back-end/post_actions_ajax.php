@@ -17,6 +17,8 @@ if (isset($_POST['action'])) {
                 $media_file = $_FILES['media'] ?? null;
                 $media_path = null;
                 $media_type = 'none'; // Default if no media
+                $target_community_id = isset($_POST['post_target_community_id']) && !empty($_POST['post_target_community_id']) 
+                ? (int)$_POST['post_target_community_id'] : null; // Obtener el ID de la comunidad
 
                 if (empty($content) && !$media_file) {
                     $response['message'] = 'El post no puede estar vacío (sin texto ni multimedia).';
@@ -66,8 +68,8 @@ if (isset($_POST['action'])) {
                 }
 
 
-                $stmt = $conn->prepare("CALL sp_CreatePost(?, ?, ?, ?)");
-                $stmt->execute([$current_user_id, $content, $media_path, $media_type]);
+                $stmt = $conn->prepare("CALL sp_CreatePost(?, ?, ?, ?, ?)");
+                $stmt->execute([$current_user_id, $content, $media_path, $media_type, $target_community_id]);
                 $new_post_data = $stmt->fetch(PDO::FETCH_ASSOC);
                 $stmt->closeCursor();
 
