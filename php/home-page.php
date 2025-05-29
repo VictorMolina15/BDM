@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'back-end/verified-session.php'
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,6 +16,7 @@ session_start();
     <!-- Stylesheet -->
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/messaging.css">
+    <link rel="stylesheet" href="../css/search_bar.css">
 </head>
 
 <body>
@@ -372,62 +374,8 @@ session_start();
                 <!------- SOLICITUDES ------->
                 <div class="friend-requests">
                     <h4>Solicitudes de amistad</h4>
-                    <div class="request">
-                        <div class="info">
-                            <div class="profile-photo">
-                                <img src="../assets/profile_pics/profile-12.jpg">
-                            </div>
-                            <div>
-                                <h5>Random</h5>
-                                <p class="text-muted">8 amigos en común</p>
-                            </div>
-                        </div>
-                        <div class="action">
-                            <button class="btn btn-primary">
-                                Aceptar
-                            </button>
-                            <button class="btn">
-                                Rechazar
-                            </button>
-                        </div>
-                    </div>
-                    <div class="request">
-                        <div class="info">
-                            <div class="profile-photo">
-                                <img src="../assets/profile_pics/profile-11.jpg">
-                            </div>
-                            <div>
-                                <h5>Random</h5>
-                                <p class="text-muted">2 amigos en común</p>
-                            </div>
-                        </div>
-                        <div class="action">
-                            <button class="btn btn-primary">
-                                Aceptar
-                            </button>
-                            <button class="btn">
-                                Rechazar
-                            </button>
-                        </div>
-                    </div>
-                    <div class="request">
-                        <div class="info">
-                            <div class="profile-photo">
-                                <img src="../assets/profile_pics/profile-9.jpg">
-                            </div>
-                            <div>
-                                <h5>Random</h5>
-                                <p class="text-muted">5 amigos en común</p>
-                            </div>
-                        </div>
-                        <div class="action">
-                            <button class="btn btn-primary">
-                                Aceptar
-                            </button>
-                            <button class="btn">
-                                Rechazar
-                            </button>
-                        </div>
+                    <div id="pending-requests-container">
+                        <p class="text-muted" style="padding: 1rem;">Cargando solicitudes...</p>
                     </div>
                 </div>
             </div>
@@ -508,8 +456,7 @@ session_start();
                 </li>
             </ul>
         </div>
-    </div>
-    <script src="../js/homepage.js"></script>
+    </div> 
     <script>
         const currentLoggedInUserId = "<?php echo htmlspecialchars($_SESSION['id_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>";
         const loggedInUser = {
@@ -519,7 +466,10 @@ session_start();
             avatar: "<?php echo htmlspecialchars($_SESSION['avatar'] ?? 'default-profile.png', ENT_QUOTES, 'UTF-8'); ?>"
         };
     </script>
+    <script src="../js/homepage.js"></script>
     <script src="../js/messaging.js"></script>
+    <script src="../js/friend_request.js"></script>
+
 </body>
 
 </html>

@@ -35,6 +35,7 @@ if ($userData) {
 
 // Verificamos si el perfil visitado es el mismo que el usuario en sesión
 $isOwnProfile = isset($_SESSION['id_name']) && $_SESSION['id_name'] === $viewedUserId;
+$friendship_status = 'loading';
 
 // Procesar mensajes de feedback de la sesión
 $editMsg = null;
@@ -80,6 +81,7 @@ if (isset($_SESSION['edit_feedback_msg'])) {
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/profile.css">
     <link rel="stylesheet" href="../css/messaging.css">
+    <link rel="stylesheet" href="../css/search_bar.css">
 
     <script src="../js/loadTheme.js"></script>
 </head>
@@ -206,7 +208,10 @@ if (isset($_SESSION['edit_feedback_msg'])) {
                                     <button class="btn-secondary">Subir historia</button>
                                     <button id="edit-profile" class="btn-secondary">Editar Perfil</button>
                                 <?php else: ?>
-                                    <button class="btn-primary">Seguir</button>
+                                    <button id="friendship-action-btn" class="btn-primary"
+                                        data-profile-id="<?= htmlspecialchars($userData['id_name']) ?>">
+                                        Cargando...
+                                    </button>
                                     <button id="initiate-chat-btn-profile" class="btn-secondary"
                                         data-other-user-id="<?= htmlspecialchars($userData['id_name']) ?>"
                                         data-other-user-name="<?= htmlspecialchars($userData['username']) ?>"
@@ -393,6 +398,126 @@ if (isset($_SESSION['edit_feedback_msg'])) {
         // Ensure 'avatar' is the correct session variable key for the profile picture filename
         avatar: "<?php echo htmlspecialchars($_SESSION['avatar'] ?? 'default-profile.png', ENT_QUOTES, 'UTF-8'); ?>"
     };
+
+    const friendshipBtn = document.getElementById('friendship-action-btn');
+    const loggedInUserId = "<?php echo htmlspecialchars($_SESSION['id_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>";
+    
+    function updateFriendshipButton(status, profileId) {
+        if (!friendshipBtn) return;
+        friendshipBtn.disabled = false;
+        friendshipBtn.textContent = 'Error al cargar estado'; // Default
+
+        switch (status) {
+            case 'friends':
+                friendshipBtn.textContent = 'Amigos';
+                friendshipBtn.className = 'btn btn-secondary'; // Cambia clase si son amigos
+                friendshipBtn.disabled = true;
+                break;
+            case 'request_sent': // El usuario actual envió una solicitud
+                friendshipBtn.textContent = 'Solicitud Enviada';
+                friendshipBtn.className = 'btn btn-secondary';
+                friendshipBtn.disabled = true; // O permitir cancelar solicitud
+                break;
+            case 'request_received': // El usuario actual recibió una solicitud de este perfil
+                friendshipBtn.textContent = 'Responder Solicitud';
+                friendshipBtn.className = 'btn btn-success'; // O alguna clase distintiva
+                // Podrías aquí añadir lógica para mostrar botones de Aceptar/Rechazar
+                // o redirigir/mostrar un modal. Por ahora, solo texto.
+                // Para responder, usualmente se haría desde la lista de solicitudes.
+                // Si quieres manejarlo aquí, necesitarías dos botones o un dropdown.
+                // Por simplicidad, asumimos que "Responder" es un indicador.
+                // O mejor, mostrar "Aceptar Solicitud"
+                // friendshipBtn.textContent = 'Aceptar Solicitud';
+                // friendshipBtn.onclick = () => handleFriendAction('accept_friend_request', profileId);
+                // O simplemente indicar que tiene una solicitud pendiente de este usuario
+                 friendshipBtn.textContent = 'Solicitud Recibida';
+                 friendshipBtn.disabled = true; // No se acciona desde aquí directamente.
+                break;
+            case 'not_friends':
+            default:
+                friendshipBtn.textContent = 'Agregar Amigo';
+                friendshipBtn.className = 'btn btn-primary';
+                friendshipBtn.onclick = () => handleFriendAction('send_friend_request', profileId);
+                break;
+        }
+    }
+
+    async function handleFriendAction(action, targetUserId) {
+        if(friendshipBtn) friendshipBtn.disabled = true;
+
+        const formData = new FormData();
+        formData.append('action', action);
+        if (action === 'send_friend_request') {
+            formData.append('receiver_id', targetUserId);
+        } else { // Para accept/reject, el targetUserId es el requester_id
+            formData.append('requester_id', targetUserId);
+        }
+
+        try {
+            const response = await fetch('back-end/friend_actions_ajax.php', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                // Actualizar el botón basado en el nuevo estado si está disponible
+                if(result.new_friendship_status) {
+                    updateFriendshipButton(result.new_friendship_status, targetUserId);
+                } else if (action === 'send_friend_request') {
+                     updateFriendshipButton('request_sent', targetUserId); // Asumir que se envió
+                }
+                // Podrías mostrar un mensaje de éxito pequeño si lo deseas
+                // alert(result.message); 
+            } else {
+                alert('Error: ' + result.message);
+                if(friendshipBtn) friendshipBtn.disabled = false; // Re-habilitar si falló
+            }
+        } catch (error) {
+            console.error('Error en la acción de amistad:', error);
+            alert('Ocurrió un error al procesar la solicitud.');
+            if(friendshipBtn) friendshipBtn.disabled = false;
+        }
+    }
+
+    function fetchFriendshipStatus() {
+        if (!friendshipBtn || loggedInUserId === friendshipBtn.dataset.profileId) {
+             if(friendshipBtn && loggedInUserId === friendship_btn.dataset.profileId) friendshipBtn.style.display = 'none'; // No mostrar botón en propio perfil
+            return;
+        }
+        
+        const profileId = friendshipBtn.dataset.profileId;
+        if (!profileId) return;
+
+        friendshipBtn.disabled = true;
+        friendshipBtn.textContent = 'Cargando...';
+
+        const formData = new FormData();
+        formData.append('action', 'get_friendship_status');
+        formData.append('profile_id', profileId);
+
+        fetch('back-end/friend_actions_ajax.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success' && data.data && data.data.friendship_status) {
+                updateFriendshipButton(data.data.friendship_status, profileId);
+            } else {
+                updateFriendshipButton('not_friends', profileId); // Fallback
+                console.error("Error fetching status or status not found: ", data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error al obtener estado de amistad:', error);
+            updateFriendshipButton('not_friends', profileId); // Fallback en caso de error de red
+        });
+    }
+
+    if (!<?php echo json_encode($isOwnProfile); ?>) { // Solo ejecutar si no es el perfil propio
+        fetchFriendshipStatus();
+    }
 </script>
 <script src="../js/messaging.js"></script>
 

@@ -234,3 +234,205 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+-- --------------- Stored Procedures para Búsqueda Global ---------------
+
+DELIMITER $$
+-- Stored Procedure para buscar usuarios globalmente (para la barra de navegación)
+CREATE PROCEDURE sp_SearchGlobalUsers (
+    IN p_search_query VARCHAR(255)
+)
+BEGIN
+    DECLARE search_param VARCHAR(260);
+    SET search_param = CONCAT('%', p_search_query, '%');
+
+    SELECT id_name, username, profile_picture
+    FROM users
+    WHERE id_name LIKE search_param OR username LIKE search_param;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+-- Stored Procedure para buscar comunidades globalmente (para la barra de navegación)
+CREATE PROCEDURE sp_SearchGlobalCommunities (
+    IN p_search_query VARCHAR(255)
+)
+BEGIN
+    DECLARE search_param VARCHAR(260);
+    SET search_param = CONCAT('%', p_search_query, '%');
+
+    SELECT id, name_comm, community_picture  -- Asegúrate que community_picture existe y es el campo correcto
+    FROM communities
+    WHERE name_comm LIKE search_param;
+END$$
+DELIMITER ;
+-- --------------- Stored Procedures para el Sistema de Amistades ---------------
+
+DELIMITER $$
+-- Enviar una solicitud de amistad
+CREATE PROCEDURE sp_SendFriendRequest(
+    IN p_sender_id VARCHAR(15),
+    IN p_receiver_id VARCHAR(15)
+)
+BEGIN
+    DECLARE existing_status ENUM('pending', 'accepted', 'rejected');
+    DECLARE inverse_status ENUM('pending', 'accepted', 'rejected');
+    DECLARE error_message VARCHAR(255);
+
+    IF p_sender_id = p_receiver_id THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No puedes enviarte una solicitud de amistad a ti mismo.';
+    END IF;
+
+    -- Verificar si ya existe una solicitud o amistad (A -> B)
+    SELECT stat INTO existing_status FROM friends WHERE user_id = p_sender_id AND friend_id = p_receiver_id LIMIT 1;
+
+    -- Verificar si existe una solicitud inversa (B -> A)
+    SELECT stat INTO inverse_status FROM friends WHERE user_id = p_receiver_id AND friend_id = p_sender_id LIMIT 1;
+
+    IF existing_status IS NOT NULL THEN
+        IF existing_status = 'pending' THEN
+            SET error_message = 'Ya has enviado una solicitud de amistad a este usuario.';
+        ELSEIF existing_status = 'accepted' THEN
+            SET error_message = 'Ya eres amigo de este usuario.';
+        ELSE -- 'rejected', permitir reenviar creando un nuevo registro o actualizando. Aquí simplemente lo bloqueamos si ya existe.
+            SET error_message = 'Tu solicitud anterior fue rechazada o cancelada.';
+             -- Para permitir re-solicitar si fue rechazada, podrías borrar el registro 'rejected'
+             -- O simplemente permitir la inserción si no es 'pending' o 'accepted'
+             -- Por simplicidad, si existe cualquier registro A->B, no hacemos nada nuevo.
+        END IF;
+        IF error_message IS NOT NULL AND existing_status != 'rejected' THEN -- Solo error si no es rejected (para permitir reenviar si quisiera)
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = error_message;
+        END IF;
+    END IF;
+
+    IF inverse_status IS NOT NULL THEN
+        IF inverse_status = 'pending' THEN
+            -- El otro usuario ya envió una solicitud, aceptarla automáticamente.
+            CALL sp_AcceptFriendRequest(p_receiver_id, p_sender_id);
+            SELECT 'mutual_acceptance' AS result_status, 'Amistad aceptada mutuamente.' AS message;
+        ELSEIF inverse_status = 'accepted' THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Ya eres amigo de este usuario (solicitud inversa aceptada).';
+        ELSE -- 'rejected' por el otro usuario
+             -- Continuar para permitir que el usuario actual envíe una nueva solicitud
+            INSERT INTO friends (user_id, friend_id, stat) VALUES (p_sender_id, p_receiver_id, 'pending')
+                ON DUPLICATE KEY UPDATE stat = 'pending'; -- Si A->B fue 'rejected', la actualiza a 'pending'
+            SELECT 'request_sent' AS result_status, 'Solicitud de amistad enviada.' AS message;
+        END IF;
+    ELSE
+        -- No existe solicitud A->B (o fue 'rejected' y queremos sobreescribir) ni B->A
+        INSERT INTO friends (user_id, friend_id, stat) VALUES (p_sender_id, p_receiver_id, 'pending')
+            ON DUPLICATE KEY UPDATE stat = 'pending'; -- Esto maneja el caso de reenviar una solicitud que fue 'rejected'
+        SELECT 'request_sent' AS result_status, 'Solicitud de amistad enviada.' AS message;
+    END IF;
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+-- Aceptar una solicitud de amistad
+CREATE PROCEDURE sp_AcceptFriendRequest(
+    IN p_requester_id VARCHAR(15), -- Quien envió la solicitud originalmente
+    IN p_accepter_id VARCHAR(15)   -- Quien está aceptando la solicitud (el usuario actual)
+)
+BEGIN
+    DECLARE row_affected INT;
+    -- Actualizar la solicitud original (requester -> accepter) a 'accepted'
+    UPDATE friends
+    SET stat = 'accepted'
+    WHERE user_id = p_requester_id AND friend_id = p_accepter_id AND stat = 'pending';
+
+    SET row_affected = ROW_COUNT();
+
+    IF row_affected > 0 THEN
+        -- Crear la relación recíproca (accepter -> requester) como 'accepted'
+        INSERT INTO friends (user_id, friend_id, stat)
+        VALUES (p_accepter_id, p_requester_id, 'accepted')
+        ON DUPLICATE KEY UPDATE stat = 'accepted'; -- En caso de que ya exista (ej. ambos enviaron y uno aceptó)
+        SELECT 'acceptance_successful' AS result_status, 'Solicitud de amistad aceptada.' AS message;
+    ELSE
+        SELECT 'request_not_found_or_not_pending' AS result_status, 'No se encontró la solicitud pendiente o ya fue gestionada.' AS message;
+    END IF;
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+-- Rechazar una solicitud de amistad
+CREATE PROCEDURE sp_RejectFriendRequest(
+    IN p_requester_id VARCHAR(15), -- Quien envió la solicitud originalmente
+    IN p_rejecter_id VARCHAR(15)   -- Quien está rechazando (el usuario actual)
+)
+BEGIN
+    -- Cambiar el estado a 'rejected'. Considera si quieres borrar el registro en su lugar.
+    UPDATE friends
+    SET stat = 'rejected'
+    WHERE user_id = p_requester_id AND friend_id = p_rejecter_id AND stat = 'pending';
+
+    IF ROW_COUNT() > 0 THEN
+        SELECT 'rejection_successful' AS result_status, 'Solicitud de amistad rechazada.' AS message;
+    ELSE
+        SELECT 'request_not_found_or_not_pending' AS result_status, 'No se encontró la solicitud pendiente o ya fue gestionada.' AS message;
+    END IF;
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+-- Obtener solicitudes de amistad pendientes para un usuario
+CREATE PROCEDURE sp_GetPendingFriendRequests(
+    IN p_current_user_id VARCHAR(15)
+)
+BEGIN
+    SELECT
+        f.user_id AS requester_id,         -- El ID del usuario que envió la solicitud
+        u.username AS requester_username,
+        u.profile_picture AS requester_avatar
+    FROM friends f
+    JOIN users u ON f.user_id = u.id_name
+    WHERE f.friend_id = p_current_user_id AND f.stat = 'pending'
+    ORDER BY f.created_at DESC;
+                              
+END$$
+DELIMITER ;
+
+DELIMITER $$
+-- Obtener el estado de amistad entre dos usuarios
+CREATE PROCEDURE sp_GetFriendshipStatus(
+    IN p_viewer_id VARCHAR(15),  -- El usuario que está viendo el perfil
+    IN p_profile_id VARCHAR(15) -- El usuario del perfil que se está viendo
+)
+BEGIN
+    DECLARE status_viewer_to_profile ENUM('pending', 'accepted', 'rejected') DEFAULT NULL;
+    DECLARE status_profile_to_viewer ENUM('pending', 'accepted', 'rejected') DEFAULT NULL;
+
+    IF p_viewer_id = p_profile_id THEN
+        SELECT 'own_profile' AS friendship_status;
+    ELSE
+        SELECT stat INTO status_viewer_to_profile FROM friends WHERE user_id = p_viewer_id AND friend_id = p_profile_id LIMIT 1;
+        SELECT stat INTO status_profile_to_viewer FROM friends WHERE user_id = p_profile_id AND friend_id = p_viewer_id LIMIT 1;
+
+        IF status_viewer_to_profile = 'accepted' -- AND status_profile_to_viewer = 'accepted' (implícito si la lógica de aceptar es correcta)
+        THEN
+            SELECT 'friends' AS friendship_status;
+        ELSEIF status_viewer_to_profile = 'pending' THEN
+            SELECT 'request_sent' AS friendship_status; -- viewer envió a profile
+        ELSEIF status_profile_to_viewer = 'pending' THEN
+            SELECT 'request_received' AS friendship_status; -- viewer recibió de profile
+        ELSE
+            SELECT 'not_friends' AS friendship_status;
+        END IF;
+    END IF;
+END$$
+DELIMITER ;
+
+-- (Opcional) Stored Procedure para obtener la lista de amigos aceptados (para el feed)
+DELIMITER $$
+CREATE PROCEDURE sp_GetAcceptedFriendIds(
+    IN p_user_id VARCHAR(15)
+)
+BEGIN
+    SELECT friend_id
+    FROM friends
+    WHERE user_id = p_user_id AND stat = 'accepted';
+END$$
+DELIMITER ;

@@ -1,0 +1,87 @@
+/* =============== Global Search Results Dropdown ============== */
+.search-bar { /* Ensure the parent of the dropdown can be a positioning context */
+    position: relative;
+}
+
+.global-search-results {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: calc(100% + 5px); /* Position below the search bar */
+    left: 0;
+    width: 100%; /* Make it as wide as the search-bar div */
+    max-height: 350px; /* Limit height and allow scrolling */
+    overflow-y: auto;
+    background: var(--color-white);
+    border-radius: var(--card-border-radius);
+    box-shadow: 0 0.2rem 1rem rgba(0,0,0,0.15); /* Softer shadow, adjust as needed */
+    z-index: 12; /* Above navbar content, below critical modals */
+    padding: 0.5rem; /* Outer padding for the container */
+}
+
+.search-results-header {
+    font-size: 0.75rem; /* Smaller header text */
+    color: var(--color-grey);
+    margin-bottom: 0.4rem;
+    padding: 0.25rem 0.5rem;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    padding: 0.6rem 0.5rem; /* Padding for each item */
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-radius: calc(var(--card-border-radius) / 2);
+    color: var(--color-dark);
+    text-decoration: none; /* Remove underline from links */
+}
+
+.search-result-item:hover {
+    background: var(--color-light);
+}
+
+.search-result-item .small-profile-photo { /* Container for small avatars */
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0; /* Prevent shrinking if text is long */
+}
+
+.search-result-item .small-profile-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.search-result-info {
+    overflow: hidden; /* Prevent text from overflowing */
+}
+
+.search-result-info h5 {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.1rem;
+    color: var(--color-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.search-result-info p.text-muted {
+    font-size: 0.75rem;
+    color: var(--color-grey);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.search-results-separator {
+    border: 0;
+    height: 1px;
+    background-color: var(--color-light); /* Use a light separator color */
+    margin: 0.5rem 0;
+}

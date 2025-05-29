@@ -23,8 +23,9 @@ CREATE TABLE friends (
     friend_id VARCHAR(15),
     stat ENUM('pending', 'accepted', 'rejected') DEFAULT 'pending',
     PRIMARY KEY (user_id, friend_id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id_name) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id_name) ON DELETE CASCADE
+    FOREIGN KEY (friend_id) REFERENCES users(id_name) ON DELETE CASCADE
 );
 
 -- Tabla de Publicaciones
