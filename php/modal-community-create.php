@@ -17,27 +17,29 @@ if (session_status() === PHP_SESSION_NONE) {
                 <label for="community-name">Nombre de la Comunidad:</label>
                 <input type="text" name="name_comm" id="community-name" placeholder="Ej: Amantes del Senderismo"
                     required
-                    style="width: 100%; padding: 8px; border: 1px solid var(--color-grey); border-radius: var(--card-border-radius); margin-top: 5px;">
+                    style="width: 100%; padding: 8px; background: var(--color-light); border: 1px solid var(--color-light); border-radius: var(--card-border-radius); margin-top: 5px;">
             </div>
 
             <div class="form-group" style="margin-top: 15px;">
                 <label for="community-description">Descripción:</label>
                 <textarea name="descrip" id="community-description" placeholder="Describe de qué trata tu comunidad..."
-                    style="width: 100%; min-height: 100px; padding: 8px; border: 1px solid var(--color-grey); border-radius: var(--card-border-radius); resize: vertical; margin-top: 5px;"></textarea>
+                    style="width: 100%; min-height: 100px; padding: 8px; font-family: poppins; background: var(--color-light); border: 1px solid var(--color-light); border-radius: var(--card-border-radius); resize: vertical; margin-top: 5px;"></textarea>
             </div>
 
             <div class="form-group" style="margin-top: 15px;">
                 <label for="community-profile-pic">Icono de la Comunidad (opcional, máx. 5MB):</label>
                 <input type="file" name="community_picture" id="community-profile-pic-input"
-                    accept="image/jpeg,image/png,image/gif" style="display: block; margin-top: 5px;">
+                    accept="image/jpeg,image/png,image/gif" style="display: block; margin-top: 5px; border: 1px solid var(--color-grey); 
+                    border-radius: calc(var(--card-border-radius) / 2); font-family: inherit; font-size: 0.9rem; padding: 5px; width: 100%">
                 <img id="community-profile-preview" src="#" alt="Icono preview"
-                    style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-top: 10px; display: none; border: 1px solid var(--color-light);" />
+                    style="width: 100px; height: 100px; border-radius: 50%; align-self: anchor-center; object-fit: cover; margin-top: 10px; display: none; border: 1px solid var(--color-light);" />
             </div>
 
             <div class="form-group" style="margin-top: 15px;">
                 <label for="community-cover-pic">Banner de la Comunidad (opcional, máx. 10MB):</label>
                 <input type="file" name="cover_picture" id="community-cover-pic-input"
-                    accept="image/jpeg,image/png,image/gif" style="display: block; margin-top: 5px;">
+                    accept="image/jpeg,image/png,image/gif" style="display: block; margin-top: 5px; border: 1px solid var(--color-grey); 
+                    border-radius: calc(var(--card-border-radius) / 2); font-family: inherit; font-size: 0.9rem; padding: 5px; width: 100%">
                 <img id="community-cover-preview" src="#" alt="Banner preview"
                     style="width: 100%; max-height: 150px; object-fit: cover; margin-top: 10px; display: none; border-radius: var(--card-border-radius);" />
             </div>

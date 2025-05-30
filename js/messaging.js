@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     profile_picture: chat.other_user_avatar
                 };
                 const profilePic = getProfilePicUrl(otherUser.profile_picture);
-                const lastMsgText = chat.last_message_content ? (chat.last_message_content.length > 25 ? chat.last_message_content.substring(0, 22) + '...' : chat.last_message_content) : 'No messages yet.';
+                const lastMsgText = chat.last_message_content ? (chat.last_message_content.length > 25 ? chat.last_message_content.substring(0, 22) + '...' : chat.last_message_content) : 'Sin mensajes.';
 
                 const chatItemHtml = `
                     <div class="message" data-chat-id="${chat.chat_id}" data-other-user-id="${otherUser.id_name}" data-other-user-name="${otherUser.username}" data-other-user-avatar="${otherUser.profile_picture || ''}">

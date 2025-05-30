@@ -12,7 +12,7 @@
                 <label for="post-caption">Descripción:</label>
                 <textarea name="caption" id="post-caption"
                     placeholder="¿Qué estás pensando, <?= htmlspecialchars($_SESSION['username'] ?? 'Usuario') ?>?"
-                    style="width: 100%; min-height: 80px; padding: 8px; border: 1px solid var(--color-grey); border-radius: var(--card-border-radius); resize: vertical;"></textarea>
+                    style="width: 100%; min-height: 80px; padding: 8px; background: var(--color-light); border: 1px solid var(--color-light); border-radius: var(--card-border-radius); resize: vertical;"></textarea>
             </div>
             <div class="form-group" style="margin-top: 15px;">
                 <label for="post-media">Multimedia (imagen o video, máx. 40MB):</label>

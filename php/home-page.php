@@ -174,9 +174,9 @@ require_once 'back-end/verified-session.php'
                                         </div>
                                     </div>
                                     <span class="edit">
-                                        <i class="uil uil-ellipsis-h"></i>
+                                        <i class="uil uil-ellipsis-h" style="cursor: pointer;"></i>
                                         <ul class="edit-menu"
-                                            style="display:none; position:absolute; background:var(--color-white); border-radius:var(--card-border-radius); box-shadow: 0 0 5px rgba(0,0,0,0.1); padding: 5px; right:0; top:100%; z-index:10;">
+                                            style="display:none; position:sticky; float: left; background:var(--color-white); border-radius:var(--card-border-radius); box-shadow: 0 0 5px rgba(0,0,0,0.4); padding: 5px; right:0; top:100%; z-index:1;">
                                             <?php if ($post['author_id'] === $_SESSION['id_name']): ?>
                                             <?php else: ?>
                                                 <li style="padding: 5px 10px; cursor:pointer;" class="block-post-option"
@@ -218,7 +218,7 @@ require_once 'back-end/verified-session.php'
                                         style="margin-top: 10px; display: flex; gap: 5px;">
                                         <input type="text" name="comment_content" class="comment-input"
                                             placeholder="Escribe un comentario..."
-                                            style="flex-grow: 1; padding: 8px; border: 1px solid var(--color-grey); border-radius: 20px; font-size:0.85rem;">
+                                            style="flex-grow: 1; padding: 8px; background: var(--color-light); border: 1px solid var(--color-light); border-radius: 20px; font-size:0.85rem;">
                                         <button type="submit" class="btn btn-primary"
                                             style="padding: 8px 12px; font-size:0.85rem;">Enviar</button>
                                     </form>

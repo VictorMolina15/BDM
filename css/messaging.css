@@ -142,6 +142,7 @@
 .chat-input-area .chat-message-input {
     flex-grow: 1;
     padding: 8px 12px;
+    background-color: var(--color-light);
     border: 1px solid var(--color-grey);
     border-radius: 20px; /* Rounded input field */
     resize: none;
